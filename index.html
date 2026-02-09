@@ -512,9 +512,11 @@ function shuttleDest(h, m) {
 const TIARO_WD = {
   6:[35,50], 7:[0,15,35,40], 8:[5,15,40,50], 9:[15,25,50,58]
 };
+const TIARO_DIRECT_WD = new Set(['6:50','7:15','7:40','8:15','8:50','9:25']);
 
 function tiaroDest(h, m) {
-  return '月島駅前・東銀座';
+  const key = `${h}:${String(m).padStart(2,'0')}`;
+  return TIARO_DIRECT_WD.has(key) ? '東銀座直行' : '月島駅経由';
 }
 
 // ===== Common =====
@@ -806,9 +808,13 @@ function render() {
     renderTimetable(
       'ttTiaro', TIARO_WD,
       'tiaro', displayType, isToday, currentH, currentTotal, nextTiaroTotal,
-      () => ({ special: false, tooltip: '月島駅前・東銀座' }),
+      (h, m) => {
+        const isDirect = tiaroDest(h, m) === '東銀座直行';
+        return { special: isDirect, tooltip: isDirect ? '東銀座直行' : '月島駅経由' };
+      },
       [
-        { color: '#e67c00', border: false, label: '月島駅前・東銀座' }
+        { color: '#e67c00', border: false, label: '月島駅経由' },
+        { color: '#e57373', border: true, label: '東銀座直行' }
       ]
     );
   }
