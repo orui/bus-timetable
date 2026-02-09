@@ -23,6 +23,8 @@
     --radius: 16px;
     --liner: #1a73e8;
     --brt: #00897b;
+    --shuttle: #e67c00;
+    --shuttle-light: #fff3e0;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
@@ -73,6 +75,7 @@
   .hero-accent { position: absolute; top: 0; left: 0; right: 0; height: 4px; }
   .hero-accent.liner { background: var(--liner); }
   .hero-accent.brt { background: var(--brt); }
+  .hero-accent.shuttle { background: var(--shuttle); }
   .hero-label {
     font-size: 13px;
     color: var(--sub);
@@ -108,6 +111,7 @@
   }
   .hero-service.liner { background: var(--primary-light); color: var(--liner); }
   .hero-service.brt { background: var(--green-light); color: var(--brt); }
+  .hero-service.shuttle { background: var(--shuttle-light); color: var(--shuttle); }
   .hero-dest {
     font-size: 12px;
     color: var(--sub);
@@ -158,6 +162,7 @@
   }
   .upcoming-svc.liner { background: var(--primary-light); color: var(--liner); }
   .upcoming-svc.brt { background: var(--green-light); color: var(--brt); }
+  .upcoming-svc.shuttle { background: var(--shuttle-light); color: var(--shuttle); }
   .upcoming-time {
     font-size: 20px;
     font-weight: 600;
@@ -228,6 +233,7 @@
   }
   .tt-header.liner { background: var(--liner); }
   .tt-header.brt { background: var(--brt); }
+  .tt-header.shuttle { background: var(--shuttle); }
   .tt-header .dest-note {
     font-weight: 400;
     font-size: 11px;
@@ -249,6 +255,7 @@
   .tt-row.past { opacity: .55; }
   .tt-row.current-liner { background: var(--primary-light); }
   .tt-row.current-brt { background: var(--green-light); }
+  .tt-row.current-shuttle { background: var(--shuttle-light); }
   .tt-hour {
     font-size: 16px;
     font-weight: 700;
@@ -257,6 +264,7 @@
   }
   .tt-hour.liner { color: var(--liner); }
   .tt-hour.brt { color: var(--brt); }
+  .tt-hour.shuttle { color: var(--shuttle); }
   .tt-minutes {
     display: flex;
     flex-wrap: wrap;
@@ -290,10 +298,18 @@
     box-shadow: 0 2px 8px rgba(0,137,123,.3);
     animation: pop .4s ease;
   }
+  .tt-min.next-shuttle {
+    background: var(--shuttle);
+    color: #fff;
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(230,124,0,.3);
+    animation: pop .4s ease;
+  }
   .tt-min.future { color: var(--text); }
   .tt-min.special { border: 2px solid #e57373; }
   .tt-min.special.next-liner,
-  .tt-min.special.next-brt { border-color: transparent; }
+  .tt-min.special.next-brt,
+  .tt-min.special.next-shuttle { border-color: transparent; }
   @keyframes pop { 0%{transform:scale(.6)} 60%{transform:scale(1.1)} 100%{transform:scale(1)} }
 
   .legend {
@@ -360,6 +376,11 @@
     <div class="timetable" id="ttBrt"></div>
   </div>
 
+  <div class="timetable-section" id="shuttleSection">
+    <div class="tt-header shuttle">シャトルバス<span class="dest-note">クロノレジデンス発（平日のみ）</span></div>
+    <div class="timetable" id="ttShuttle"></div>
+  </div>
+
   <div class="footer">毎秒自動更新</div>
 </div>
 
@@ -408,6 +429,17 @@ function brtDest(h, m, dayType) {
   return isShinbashi ? '新橋 止まり' : '虎ノ門ヒルズ';
 }
 
+// ===== シャトルバス（クロノレジデンス発・平日のみ）=====
+const SHUTTLE_WD = {
+  6:[30,45], 7:[0,15,30,45], 8:[0,15,30,45], 9:[0,15,45]
+};
+const SHUTTLE_DIRECT_WD = new Set(['6:45','7:15','7:45','8:15','8:45','9:15']);
+
+function shuttleDest(h, m) {
+  const key = `${h}:${String(m).padStart(2,'0')}`;
+  return SHUTTLE_DIRECT_WD.has(key) ? '東銀座直行' : '月島駅経由';
+}
+
 // ===== Common =====
 let activeTab = null;
 
@@ -420,7 +452,10 @@ function schedToList(sched, service, dayType) {
   const times = [];
   for (const h of Object.keys(sched).map(Number).sort((a,b)=>a-b)) {
     for (const m of sched[h]) {
-      const dest = service === 'liner' ? linerDest(h, m, dayType) : brtDest(h, m, dayType);
+      let dest;
+      if (service === 'liner') dest = linerDest(h, m, dayType);
+      else if (service === 'brt') dest = brtDest(h, m, dayType);
+      else dest = shuttleDest(h, m);
       times.push({ h, m, total: h*60+m, service, dest, dayType });
     }
   }
@@ -434,6 +469,10 @@ function getAllBuses(dayType) {
     ...schedToList(lSched, 'liner', dayType),
     ...schedToList(bSched, 'brt', dayType)
   ];
+  // シャトルバスは平日のみ
+  if (dayType === 'weekday') {
+    all.push(...schedToList(SHUTTLE_WD, 'shuttle', dayType));
+  }
   all.sort((a,b) => a.total - b.total || (a.service === 'liner' ? -1 : 1));
   return all;
 }
@@ -478,7 +517,15 @@ function waitLabel(min) {
 }
 
 function svcLabel(svc) {
-  return svc === 'liner' ? 'ライナー' : 'BRT';
+  if (svc === 'liner') return 'ライナー';
+  if (svc === 'brt') return 'BRT';
+  return 'シャトル';
+}
+
+function svcFullLabel(svc) {
+  if (svc === 'liner') return '晴海ライナー';
+  if (svc === 'brt') return '東京BRT';
+  return 'シャトルバス';
 }
 
 function switchTab(type) {
@@ -520,9 +567,9 @@ function render() {
     heroWait.textContent = `あと ${waitLabel(next.wait)}`;
     heroWait.className = 'hero-wait' +
       (next.wait <= 3 ? ' urgent' : next.wait <= 10 ? ' soon' : '');
-    heroService.textContent = next.service === 'liner' ? '晴海ライナー' : '東京BRT';
+    heroService.textContent = svcFullLabel(next.service);
     heroService.className = 'hero-service ' + next.service;
-    heroDest.textContent = next.dest + ' 行き';
+    heroDest.textContent = next.service === 'shuttle' ? next.dest : next.dest + ' 行き';
     heroNextDay.textContent = next.isNextDay
       ? `（明日 ${next.dayType==='weekend'?'土休日':'平日'}ダイヤ）` : '';
   } else {
@@ -563,12 +610,15 @@ function render() {
   // Find next bus per service for highlighting
   let nextLinerTotal = null;
   let nextBrtTotal = null;
+  let nextShuttleTotal = null;
   if (isToday) {
     const allToday = getAllBuses(todayType);
     const nl = allToday.find(t => t.service === 'liner' && t.total > currentTotal);
     const nb = allToday.find(t => t.service === 'brt' && t.total > currentTotal);
+    const ns = allToday.find(t => t.service === 'shuttle' && t.total > currentTotal);
     if (nl) nextLinerTotal = nl.total;
     if (nb) nextBrtTotal = nb.total;
+    if (ns) nextShuttleTotal = ns.total;
   }
 
   // Render Liner timetable
@@ -598,12 +648,32 @@ function render() {
       { color: '#e57373', border: true, label: '新橋止まり' }
     ]
   );
+
+  // Render Shuttle timetable (weekday only)
+  const shuttleSection = document.getElementById('shuttleSection');
+  if (displayType === 'weekend') {
+    shuttleSection.style.display = 'none';
+  } else {
+    shuttleSection.style.display = '';
+    renderTimetable(
+      'ttShuttle', SHUTTLE_WD,
+      'shuttle', displayType, isToday, currentH, currentTotal, nextShuttleTotal,
+      (h, m) => {
+        const isDirect = shuttleDest(h, m) === '東銀座直行';
+        return { special: isDirect, tooltip: isDirect ? '東銀座直行' : '月島駅経由' };
+      },
+      [
+        { color: '#e67c00', border: false, label: '月島駅経由' },
+        { color: '#e57373', border: true, label: '東銀座直行' }
+      ]
+    );
+  }
 }
 
 function renderTimetable(id, sched, service, displayType, isToday, currentH, currentTotal, nextTotal, infoFn, legendItems) {
   const hours = Object.keys(sched).map(Number).sort((a,b)=>a-b);
-  const nextCls = service === 'liner' ? 'next-liner' : 'next-brt';
-  const currentCls = service === 'liner' ? 'current-liner' : 'current-brt';
+  const nextCls = `next-${service}`;
+  const currentCls = `current-${service}`;
 
   const legend = `<div class="legend">${legendItems.map(li =>
     `<span class="legend-item"><span class="legend-dot" style="background:${li.color}${li.border ? ';border:2px solid #c62828' : ''}"></span> ${li.label}</span>`
