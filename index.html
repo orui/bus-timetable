@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>バス時刻表</title>
+<style>
+  :root {
+    --primary: #1a73e8;
+    --primary-light: #e8f0fe;
+    --accent: #ea4335;
+    --green: #34a853;
+    --orange: #f9ab00;
+    --bg: #f8f9fa;
+    --card: #fff;
+    --text: #202124;
+    --sub: #5f6368;
+    --border: #e0e0e0;
+    --radius: 16px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Noto Sans JP", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100dvh;
+  }
+
+  /* Header */
+  header {
+    background: var(--primary);
+    color: #fff;
+    padding: 16px 20px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    box-shadow: 0 2px 8px rgba(0,0,0,.15);
+  }
+  header h1 { font-size: 18px; font-weight: 600; }
+  .header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .day-badge {
+    font-size: 12px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    background: rgba(255,255,255,.2);
+    font-weight: 500;
+  }
+
+  /* Main container */
+  .container {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 16px;
+  }
+
+  /* Next bus hero card */
+  .hero {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 24px;
+    text-align: center;
+    box-shadow: 0 1px 4px rgba(0,0,0,.08);
+    margin-bottom: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary), var(--green));
+  }
+  .hero-label {
+    font-size: 13px;
+    color: var(--sub);
+    margin-bottom: 4px;
+  }
+  .hero-time {
+    font-size: 56px;
+    font-weight: 700;
+    letter-spacing: -2px;
+    color: var(--text);
+    line-height: 1.1;
+  }
+  .hero-wait {
+    display: inline-block;
+    margin-top: 8px;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--primary);
+    background: var(--primary-light);
+    padding: 4px 16px;
+    border-radius: 20px;
+  }
+  .hero-wait.urgent {
+    color: #fff;
+    background: var(--accent);
+    animation: pulse 1.5s infinite;
+  }
+  .hero-wait.soon {
+    color: #fff;
+    background: var(--orange);
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: .7; }
+  }
+  .hero-next-day {
+    font-size: 12px;
+    color: var(--sub);
+    margin-top: 6px;
+  }
+  .now-clock {
+    font-size: 13px;
+    color: var(--sub);
+    margin-top: 10px;
+  }
+
+  /* Upcoming list */
+  .section-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--sub);
+    margin: 20px 0 8px;
+    padding-left: 4px;
+  }
+  .upcoming {
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: 0 1px 4px rgba(0,0,0,.08);
+    overflow: hidden;
+  }
+  .upcoming-item {
+    display: flex;
+    align-items: center;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+    transition: background .15s;
+  }
+  .upcoming-item:last-child { border-bottom: none; }
+  .upcoming-time {
+    font-size: 20px;
+    font-weight: 600;
+    width: 70px;
+    flex-shrink: 0;
+  }
+  .upcoming-bar {
+    flex: 1;
+    height: 6px;
+    background: #eee;
+    border-radius: 3px;
+    margin: 0 14px;
+    overflow: hidden;
+  }
+  .upcoming-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    background: var(--primary);
+    transition: width .5s;
+  }
+  .upcoming-wait {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--sub);
+    white-space: nowrap;
+    min-width: 60px;
+    text-align: right;
+  }
+  .no-bus {
+    padding: 24px;
+    text-align: center;
+    color: var(--sub);
+    font-size: 14px;
+  }
+
+  /* Timetable tabs */
+  .tabs {
+    display: flex;
+    gap: 8px;
+    margin: 20px 0 10px;
+  }
+  .tab {
+    flex: 1;
+    padding: 10px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 600;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    background: var(--card);
+    color: var(--sub);
+    box-shadow: 0 1px 3px rgba(0,0,0,.06);
+    transition: all .2s;
+  }
+  .tab.active {
+    background: var(--primary);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(26,115,232,.3);
+  }
+
+  /* Full timetable grid */
+  .timetable {
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: 0 1px 4px rgba(0,0,0,.08);
+    overflow: hidden;
+  }
+  .tt-row {
+    display: flex;
+    align-items: baseline;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .tt-row:last-child { border-bottom: none; }
+  .tt-row.past { opacity: .4; }
+  .tt-row.current { background: var(--primary-light); }
+  .tt-hour {
+    font-size: 18px;
+    font-weight: 700;
+    width: 40px;
+    flex-shrink: 0;
+    color: var(--primary);
+  }
+  .tt-minutes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    flex: 1;
+  }
+  .tt-min {
+    font-size: 16px;
+    font-weight: 500;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all .2s;
+  }
+  .tt-min.past { color: #bbb; }
+  .tt-min.next {
+    background: var(--primary);
+    color: #fff;
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(26,115,232,.3);
+    animation: pop .4s ease;
+  }
+  .tt-min.future { color: var(--text); }
+  @keyframes pop {
+    0% { transform: scale(0.6); }
+    60% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+  }
+
+  .footer {
+    text-align: center;
+    font-size: 11px;
+    color: #aaa;
+    padding: 24px 0 40px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-row">
+    <h1>🚌 バス時刻表</h1>
+    <span class="day-badge" id="dayBadge"></span>
+  </div>
+</header>
+
+<div class="container">
+  <!-- Next bus hero -->
+  <div class="hero">
+    <div class="hero-label">次のバス</div>
+    <div class="hero-time" id="nextTime">--:--</div>
+    <div class="hero-wait" id="nextWait">--</div>
+    <div class="hero-next-day" id="nextDay"></div>
+    <div class="now-clock" id="nowClock"></div>
+  </div>
+
+  <!-- Upcoming buses -->
+  <div class="section-title">この後のバス</div>
+  <div class="upcoming" id="upcomingList"></div>
+
+  <!-- Timetable tabs -->
+  <div class="tabs">
+    <button class="tab active" data-type="weekday" onclick="switchTab('weekday')">平日</button>
+    <button class="tab" data-type="weekend" onclick="switchTab('weekend')">土休日</button>
+  </div>
+
+  <!-- Full timetable -->
+  <div class="timetable" id="timetable"></div>
+
+  <div class="footer">毎分自動更新</div>
+</div>
+
+<script>
+const WEEKDAY = {
+  7:[16,36,56], 8:[16,36], 9:[1,26,51], 10:[13,43], 11:[13,43],
+  12:[13,53], 13:[33], 14:[13,53], 15:[33], 16:[3,33,59],
+  17:[27,50], 18:[19,36], 19:[8]
+};
+const WEEKEND = {
+  8:[26], 9:[26,56], 10:[36], 11:[6,36], 12:[36],
+  13:[26,56], 14:[26], 15:[0,18], 16:[15,56], 17:[50],
+  18:[19], 19:[8]
+};
+
+let activeTab = null; // null = auto
+
+function getDayType(date) {
+  const d = date.getDay();
+  return (d === 0 || d === 6) ? 'weekend' : 'weekday';
+}
+
+function getSchedule(type) {
+  return type === 'weekend' ? WEEKEND : WEEKDAY;
+}
+
+function getAllTimes(type) {
+  const sched = getSchedule(type);
+  const times = [];
+  for (const h of Object.keys(sched).map(Number).sort((a,b)=>a-b)) {
+    for (const m of sched[h]) {
+      times.push({ h, m, total: h*60+m });
+    }
+  }
+  return times;
+}
+
+function getNextBus(now) {
+  const dayType = getDayType(now);
+  const current = now.getHours()*60 + now.getMinutes();
+  const times = getAllTimes(dayType);
+  const next = times.find(t => t.total > current);
+  if (next) {
+    return { ...next, wait: next.total - current, dayType, isNextDay: false };
+  }
+  // Tomorrow
+  const tomorrow = new Date(now);
+  tomorrow.setDate(tomorrow.getDate()+1);
+  const tomorrowType = getDayType(tomorrow);
+  const tomorrowTimes = getAllTimes(tomorrowType);
+  if (tomorrowTimes.length) {
+    const first = tomorrowTimes[0];
+    const wait = (24*60 - current) + first.total;
+    return { ...first, wait, dayType: tomorrowType, isNextDay: true };
+  }
+  return null;
+}
+
+function getUpcoming(now, count=4) {
+  const dayType = getDayType(now);
+  const current = now.getHours()*60 + now.getMinutes();
+  const times = getAllTimes(dayType);
+  const upcoming = times.filter(t => t.total > current);
+  // Skip the first (hero), take next `count`
+  return upcoming.slice(1, 1+count).map(t => ({
+    ...t, wait: t.total - current, dayType
+  }));
+}
+
+function fmt(h, m) {
+  return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+}
+
+function waitLabel(min) {
+  if (min >= 60) {
+    const h = Math.floor(min/60);
+    const m = min % 60;
+    return m > 0 ? `${h}時間${m}分` : `${h}時間`;
+  }
+  return `${min}分`;
+}
+
+function switchTab(type) {
+  activeTab = type;
+  document.querySelectorAll('.tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.type === type);
+  });
+  render();
+}
+
+function render() {
+  const now = new Date();
+  const todayType = getDayType(now);
+  const currentH = now.getHours();
+  const currentM = now.getMinutes();
+  const currentTotal = currentH*60 + currentM;
+
+  // Day badge
+  document.getElementById('dayBadge').textContent =
+    todayType === 'weekend' ? '土休日ダイヤ' : '平日ダイヤ';
+
+  // Current clock
+  const sec = String(now.getSeconds()).padStart(2,'0');
+  document.getElementById('nowClock').textContent =
+    `現在 ${fmt(currentH, currentM)}:${sec}`;
+
+  // Next bus
+  const next = getNextBus(now);
+  const heroTime = document.getElementById('nextTime');
+  const heroWait = document.getElementById('nextWait');
+  const heroNextDay = document.getElementById('nextDay');
+
+  if (next) {
+    heroTime.textContent = fmt(next.h, next.m);
+    heroWait.textContent = `あと ${waitLabel(next.wait)}`;
+    heroWait.className = 'hero-wait' +
+      (next.wait <= 3 ? ' urgent' : next.wait <= 10 ? ' soon' : '');
+    heroNextDay.textContent = next.isNextDay
+      ? `（明日 ${next.dayType==='weekend'?'土休日':'平日'}ダイヤ）` : '';
+  } else {
+    heroTime.textContent = '--:--';
+    heroWait.textContent = '運行終了';
+    heroWait.className = 'hero-wait';
+    heroNextDay.textContent = '';
+  }
+
+  // Upcoming
+  const upcoming = getUpcoming(now);
+  const list = document.getElementById('upcomingList');
+  if (upcoming.length === 0) {
+    list.innerHTML = '<div class="no-bus">この後のバスはありません</div>';
+  } else {
+    const maxWait = upcoming[upcoming.length-1].wait || 1;
+    list.innerHTML = upcoming.map(bus => {
+      const pct = Math.max(5, Math.min(100, (1 - bus.wait / (maxWait*1.2)) * 100));
+      return `<div class="upcoming-item">
+        <span class="upcoming-time">${fmt(bus.h, bus.m)}</span>
+        <div class="upcoming-bar"><div class="upcoming-bar-fill" style="width:${pct}%"></div></div>
+        <span class="upcoming-wait">${waitLabel(bus.wait)}</span>
+      </div>`;
+    }).join('');
+  }
+
+  // Timetable
+  const displayType = activeTab || todayType;
+  // Sync tab highlight
+  document.querySelectorAll('.tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.type === displayType);
+  });
+
+  const sched = getSchedule(displayType);
+  const hours = Object.keys(sched).map(Number).sort((a,b)=>a-b);
+  const isToday = displayType === todayType;
+
+  // Find next bus time for highlighting
+  let nextTotal = null;
+  if (isToday && next && !next.isNextDay) {
+    nextTotal = next.h * 60 + next.m;
+  }
+
+  const tbl = document.getElementById('timetable');
+  tbl.innerHTML = hours.map(hour => {
+    const isPastHour = isToday && hour < currentH;
+    const isCurrentHour = isToday && hour === currentH;
+
+    const rowClass = isPastHour ? 'tt-row past'
+      : isCurrentHour ? 'tt-row current' : 'tt-row';
+
+    const mins = sched[hour].map(m => {
+      const t = hour*60+m;
+      let cls = 'tt-min';
+      if (isToday && t <= currentTotal) cls += ' past';
+      else if (nextTotal !== null && t === nextTotal) cls += ' next';
+      else cls += ' future';
+      return `<span class="${cls}">${String(m).padStart(2,'0')}</span>`;
+    }).join('');
+
+    return `<div class="${rowClass}">
+      <span class="tt-hour">${hour}</span>
+      <div class="tt-minutes">${mins}</div>
+    </div>`;
+  }).join('');
+}
+
+// Initial render & auto-update
+render();
+setInterval(render, 1000);
+
+// Auto-select today's tab on load
+activeTab = null;
+</script>
+</body>
+</html>
