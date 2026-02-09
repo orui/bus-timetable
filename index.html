@@ -377,7 +377,7 @@
   </div>
 
   <div class="timetable-section" id="shuttleSection">
-    <div class="tt-header shuttle">シャトルバス<span class="dest-note">クロノレジデンス発（平日のみ）</span></div>
+    <div class="tt-header shuttle">住民バス<span class="dest-note">クロノレジデンス発（平日のみ）</span></div>
     <div class="timetable" id="ttShuttle"></div>
   </div>
 
@@ -429,7 +429,7 @@ function brtDest(h, m, dayType) {
   return isShinbashi ? '新橋 止まり' : '虎ノ門ヒルズ';
 }
 
-// ===== シャトルバス（クロノレジデンス発・平日のみ）=====
+// ===== 住民バス（クロノレジデンス発・平日のみ）=====
 const SHUTTLE_WD = {
   6:[30,45], 7:[0,15,30,45], 8:[0,15,30,45], 9:[0,15,45]
 };
@@ -469,7 +469,7 @@ function getAllBuses(dayType) {
     ...schedToList(lSched, 'liner', dayType),
     ...schedToList(bSched, 'brt', dayType)
   ];
-  // シャトルバスは平日のみ
+  // 住民バスは平日のみ
   if (dayType === 'weekday') {
     all.push(...schedToList(SHUTTLE_WD, 'shuttle', dayType));
   }
@@ -519,13 +519,13 @@ function waitLabel(min) {
 function svcLabel(svc) {
   if (svc === 'liner') return 'ライナー';
   if (svc === 'brt') return 'BRT';
-  return 'シャトル';
+  return '住民バス';
 }
 
 function svcFullLabel(svc) {
   if (svc === 'liner') return '晴海ライナー';
   if (svc === 'brt') return '東京BRT';
-  return 'シャトルバス';
+  return '住民バス';
 }
 
 function switchTab(type) {
