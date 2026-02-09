@@ -259,6 +259,60 @@
     100% { transform: scale(1); }
   }
 
+  /* Route badges */
+  .route-badge {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 4px;
+    margin-left: 6px;
+    vertical-align: middle;
+    white-space: nowrap;
+  }
+  .route-yurakucho {
+    background: #fce4ec;
+    color: #c62828;
+  }
+  .route-tokyo {
+    background: #e3f2fd;
+    color: #1565c0;
+  }
+  .hero-route {
+    font-size: 13px;
+    font-weight: 600;
+    margin-top: 8px;
+    padding: 4px 12px;
+    border-radius: 6px;
+    display: inline-block;
+  }
+  .tt-min.yurakucho {
+    border: 2px solid #e57373;
+  }
+  .tt-min.yurakucho.next {
+    background: #c62828;
+    border-color: #c62828;
+  }
+  .legend {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    padding: 10px 16px;
+    font-size: 12px;
+    color: var(--sub);
+    border-bottom: 1px solid var(--border);
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
   .footer {
     text-align: center;
     font-size: 11px;
@@ -282,6 +336,7 @@
     <div class="hero-label">次のバス</div>
     <div class="hero-time" id="nextTime">--:--</div>
     <div class="hero-wait" id="nextWait">--</div>
+    <div class="hero-route" id="nextRoute"></div>
     <div class="hero-next-day" id="nextDay"></div>
     <div class="now-clock" id="nowClock"></div>
   </div>
@@ -313,6 +368,19 @@ const WEEKEND = {
   13:[26,56], 14:[26], 15:[0,18], 16:[15,56], 17:[50],
   18:[19], 19:[8]
 };
+
+// 有楽町駅行き（それ以外は東京駅八重洲北口行き）
+const YURAKUCHO_WEEKDAY = new Set(['7:16','7:36','7:56','18:19','19:08']);
+const YURAKUCHO_WEEKEND = new Set(['18:19','19:08']);
+
+function isYurakucho(h, m, type) {
+  const key = `${h}:${String(m).padStart(2,'0')}`;
+  return type === 'weekend' ? YURAKUCHO_WEEKEND.has(key) : YURAKUCHO_WEEKDAY.has(key);
+}
+
+function routeLabel(h, m, type) {
+  return isYurakucho(h, m, type) ? '有楽町駅' : '東京駅八重洲北口';
+}
 
 let activeTab = null; // null = auto
 
@@ -411,17 +479,23 @@ function render() {
   const heroWait = document.getElementById('nextWait');
   const heroNextDay = document.getElementById('nextDay');
 
+  const heroRoute = document.getElementById('nextRoute');
   if (next) {
     heroTime.textContent = fmt(next.h, next.m);
     heroWait.textContent = `あと ${waitLabel(next.wait)}`;
     heroWait.className = 'hero-wait' +
       (next.wait <= 3 ? ' urgent' : next.wait <= 10 ? ' soon' : '');
+    const yk = isYurakucho(next.h, next.m, next.dayType);
+    heroRoute.textContent = yk ? '有楽町駅 行き' : '東京駅八重洲北口 行き';
+    heroRoute.className = 'hero-route ' + (yk ? 'route-yurakucho' : 'route-tokyo');
     heroNextDay.textContent = next.isNextDay
       ? `（明日 ${next.dayType==='weekend'?'土休日':'平日'}ダイヤ）` : '';
   } else {
     heroTime.textContent = '--:--';
     heroWait.textContent = '運行終了';
     heroWait.className = 'hero-wait';
+    heroRoute.textContent = '';
+    heroRoute.className = 'hero-route';
     heroNextDay.textContent = '';
   }
 
@@ -434,8 +508,12 @@ function render() {
     const maxWait = upcoming[upcoming.length-1].wait || 1;
     list.innerHTML = upcoming.map(bus => {
       const pct = Math.max(5, Math.min(100, (1 - bus.wait / (maxWait*1.2)) * 100));
+      const yk = isYurakucho(bus.h, bus.m, bus.dayType);
+      const badge = yk
+        ? '<span class="route-badge route-yurakucho">有楽町</span>'
+        : '<span class="route-badge route-tokyo">東京駅</span>';
       return `<div class="upcoming-item">
-        <span class="upcoming-time">${fmt(bus.h, bus.m)}</span>
+        <span class="upcoming-time">${fmt(bus.h, bus.m)}${badge}</span>
         <div class="upcoming-bar"><div class="upcoming-bar-fill" style="width:${pct}%"></div></div>
         <span class="upcoming-wait">${waitLabel(bus.wait)}</span>
       </div>`;
@@ -460,7 +538,11 @@ function render() {
   }
 
   const tbl = document.getElementById('timetable');
-  tbl.innerHTML = hours.map(hour => {
+  const legend = `<div class="legend">
+    <span class="legend-item"><span class="legend-dot" style="background:#1565c0"></span> 東京駅八重洲北口</span>
+    <span class="legend-item"><span class="legend-dot" style="background:#e57373;border:2px solid #c62828"></span> 有楽町駅</span>
+  </div>`;
+  tbl.innerHTML = legend + hours.map(hour => {
     const isPastHour = isToday && hour < currentH;
     const isCurrentHour = isToday && hour === currentH;
 
@@ -473,7 +555,8 @@ function render() {
       if (isToday && t <= currentTotal) cls += ' past';
       else if (nextTotal !== null && t === nextTotal) cls += ' next';
       else cls += ' future';
-      return `<span class="${cls}">${String(m).padStart(2,'0')}</span>`;
+      if (isYurakucho(hour, m, displayType)) cls += ' yurakucho';
+      return `<span class="${cls}" title="${routeLabel(hour, m, displayType)}行き">${String(m).padStart(2,'0')}</span>`;
     }).join('');
 
     return `<div class="${rowClass}">
