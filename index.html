@@ -340,9 +340,10 @@
     font-size: 12px;
     color: var(--sub);
   }
-  .time-picker input[type="time"] {
+  .time-picker input[type="time"],
+  .time-picker input[type="date"] {
     font-family: inherit;
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 600;
     padding: 6px 10px;
     border: 1px solid var(--border);
@@ -351,7 +352,8 @@
     color: var(--text);
     outline: none;
   }
-  .time-picker input[type="time"]:focus {
+  .time-picker input[type="time"]:focus,
+  .time-picker input[type="date"]:focus {
     border-color: var(--primary);
     box-shadow: 0 0 0 2px var(--primary-light);
   }
@@ -400,9 +402,10 @@
 
 <div class="container">
   <div class="time-picker">
-    <label for="simTime">時刻指定</label>
-    <input type="time" id="simTime" onchange="onSimTimeChange()">
-    <button class="btn-now hidden" id="btnNow" onclick="clearSimTime()">現在時刻に戻す</button>
+    <label>日時指定</label>
+    <input type="date" id="simDate" onchange="onSimChange()">
+    <input type="time" id="simTime" onchange="onSimChange()">
+    <button class="btn-now hidden" id="btnNow" onclick="clearSim()">現在に戻す</button>
   </div>
 
   <div class="hero">
@@ -501,7 +504,7 @@ function shuttleDest(h, m) {
 
 // ===== Common =====
 let activeTab = null;
-let simTime = null; // { h, m } or null for live mode
+let simDateTime = null; // Date object or null for live mode
 
 function getDayType(date) {
   const d = date.getDay();
@@ -567,6 +570,14 @@ function fmt(h, m) {
   return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
 }
 
+function fmtDate(d) {
+  const y = d.getFullYear();
+  const mon = d.getMonth() + 1;
+  const day = d.getDate();
+  const wd = ['日','月','火','水','木','金','土'][d.getDay()];
+  return `${y}/${mon}/${day}（${wd}）`;
+}
+
 function waitLabel(min) {
   if (min >= 60) {
     const h = Math.floor(min/60);
@@ -588,19 +599,28 @@ function svcFullLabel(svc) {
   return '住民バス';
 }
 
-function onSimTimeChange() {
-  const val = document.getElementById('simTime').value;
-  if (val) {
-    const [h, m] = val.split(':').map(Number);
-    simTime = { h, m };
+function onSimChange() {
+  const dateVal = document.getElementById('simDate').value;
+  const timeVal = document.getElementById('simTime').value;
+  if (!dateVal && !timeVal) {
+    simDateTime = null;
   } else {
-    simTime = null;
+    const base = dateVal ? new Date(dateVal + 'T00:00:00') : new Date();
+    if (timeVal) {
+      const [h, m] = timeVal.split(':').map(Number);
+      base.setHours(h, m, 0, 0);
+    } else {
+      const now = new Date();
+      base.setHours(now.getHours(), now.getMinutes(), 0, 0);
+    }
+    simDateTime = base;
   }
   render();
 }
 
-function clearSimTime() {
-  simTime = null;
+function clearSim() {
+  simDateTime = null;
+  document.getElementById('simDate').value = '';
   document.getElementById('simTime').value = '';
   render();
 }
@@ -615,17 +635,13 @@ function switchTab(type) {
 
 function render() {
   const realNow = new Date();
-  const isSim = simTime !== null;
+  const isSim = simDateTime !== null;
 
   // Show/hide sim UI elements
   document.getElementById('btnNow').classList.toggle('hidden', !isSim);
   document.getElementById('simBadge').classList.toggle('hidden', !isSim);
 
-  const now = isSim ? (() => {
-    const d = new Date(realNow);
-    d.setHours(simTime.h, simTime.m, 0, 0);
-    return d;
-  })() : realNow;
+  const now = isSim ? simDateTime : realNow;
 
   const todayType = getDayType(now);
   const currentH = now.getHours();
@@ -637,11 +653,11 @@ function render() {
 
   if (isSim) {
     document.getElementById('nowClock').textContent =
-      `指定時刻 ${fmt(currentH, currentM)}`;
+      `指定: ${fmtDate(now)} ${fmt(currentH, currentM)}`;
   } else {
     const sec = String(realNow.getSeconds()).padStart(2,'0');
     document.getElementById('nowClock').textContent =
-      `現在 ${fmt(currentH, currentM)}:${sec}`;
+      `${fmtDate(realNow)} ${fmt(currentH, currentM)}:${sec}`;
   }
 
   // Next buses (hero + 5 upcoming)
