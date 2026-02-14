@@ -390,7 +390,408 @@
     color: #aaa;
     padding: 24px 0 40px;
   }
-</style>
+
+    /* ダークモード対応 */
+    :root {
+      --bg-color: #ffffff;
+      --text-color: #333333;
+      --card-bg: #f8f9fa;
+      --border-color: #dee2e6;
+      --accent-color: #007bff;
+    }
+    
+    [data-theme="dark"] {
+      --bg-color: #1a1a1a;
+      --text-color: #e9ecef;
+      --card-bg: #2d2d2d;
+      --border-color: #495057;
+      --accent-color: #4dabf7;
+    }
+    
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+    
+    .card, .btn, input, select {
+      background-color: var(--card-bg);
+      color: var(--text-color);
+      border-color: var(--border-color);
+    }
+    
+    .btn-primary {
+      background-color: var(--accent-color);
+      border-color: var(--accent-color);
+    }
+    
+    /* ダークモード切り替えボタン */
+    .theme-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: var(--accent-color);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      font-size: 20px;
+      cursor: pointer;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      transition: transform 0.2s ease;
+      z-index: 1000;
+    }
+    
+    .theme-toggle:hover {
+      transform: scale(1.1);
+    }
+    
+    /* お気に入り停留所 */
+    .favorites-panel {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 20px;
+      display: none;
+    }
+    
+    .favorites-panel.show {
+      display: block;
+    }
+    
+    .favorites-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    
+    .favorites-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    
+    .favorite-item {
+      background: var(--accent-color);
+      color: white;
+      padding: 8px 15px;
+      border-radius: 20px;
+      text-decoration: none;
+      font-size: 14px;
+      transition: all 0.2s ease;
+    }
+    
+    .favorite-item:hover {
+      background: var(--accent-color);
+      opacity: 0.8;
+      color: white;
+      text-decoration: none;
+    }
+    
+    .favorite-item .remove-btn {
+      margin-left: 8px;
+      opacity: 0.7;
+      cursor: pointer;
+    }
+    
+    .favorite-item .remove-btn:hover {
+      opacity: 1;
+    }
+    
+    .add-favorite-btn {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--accent-color);
+      font-size: 18px;
+      cursor: pointer;
+      opacity: 0.7;
+      transition: opacity 0.2s ease;
+    }
+    
+    .add-favorite-btn:hover {
+      opacity: 1;
+    }
+    
+  /* 通知機能 */
+  .notification-panel {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 15px;
+    min-width: 280px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    transform: translateX(320px);
+    transition: transform 0.3s ease;
+    z-index: 1000;
+  }
+  
+  .notification-panel.show {
+    transform: translateX(0);
+  }
+  
+  .notification-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+  }
+  
+  .notification-setting {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  
+  .notify-toggle {
+    position: fixed;
+    bottom: 20px;
+    right: 80px;
+    background: var(--accent-color);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    font-size: 20px;
+    cursor: pointer;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    transition: transform 0.2s ease;
+    z-index: 999;
+  }
+  
+  .notify-toggle:hover {
+    transform: scale(1.1);
+  }
+  
+  .notify-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: #ff4444;
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .notification-toast {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--accent-color);
+    color: white;
+    padding: 15px 20px;
+    border-radius: 8px;
+    font-weight: bold;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    z-index: 2000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  
+  .notification-toast.show {
+    opacity: 1;
+  }
+  
+  .time-input-group {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  
+  .time-input {
+    flex: 1;
+    padding: 5px 8px;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    background: var(--card-bg);
+    color: var(--text-color);
+  }
+  
+  /* アクセシビリティ強化 */
+  
+  /* フォーカス表示の改善 */
+  *:focus {
+    outline: 2px solid var(--accent-color);
+    outline-offset: 2px;
+  }
+  
+  /* ボタンのフォーカス状態 */
+  button:focus,
+  .btn:focus {
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+  }
+  
+  /* キーボードナビゲーション用のスタイル */
+  .keyboard-navigation .focusable:focus {
+    background-color: var(--accent-color);
+    color: white;
+    transform: scale(1.05);
+  }
+  
+  /* 高コントラストモード対応 */
+  @media (prefers-contrast: high) {
+    :root {
+      --text-color: #000000;
+      --bg-color: #ffffff;
+      --border-color: #000000;
+    }
+    
+    [data-theme="dark"] {
+      --text-color: #ffffff;
+      --bg-color: #000000;
+      --border-color: #ffffff;
+    }
+    
+    button, .btn {
+      border-width: 2px;
+    }
+  }
+  
+  /* 動きを減らす設定への対応 */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+  
+  /* 大きなフォントサイズ対応 */
+  @media (min-width: 1200px) {
+    .large-text body {
+      font-size: 18px;
+    }
+    
+    .large-text .btn {
+      padding: 12px 24px;
+      font-size: 16px;
+    }
+    
+    .large-text .theme-toggle,
+    .large-text .notify-toggle {
+      width: 60px;
+      height: 60px;
+      font-size: 24px;
+    }
+  }
+  
+  /* スクリーンリーダー専用テキスト */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+  
+  /* 音声読み上げのための改善 */
+  .bus-time {
+    speak: literal;
+  }
+  
+  .status-text {
+    aria-live: polite;
+  }
+  
+  /* カラーユニバーサルデザイン */
+  .color-blind-friendly {
+    /* 色だけでなく形やテキストでも情報を伝える */
+  }
+  
+  .status-ok::before { content: "✅ "; }
+  .status-warning::before { content: "⚠️ "; }
+  .status-error::before { content: "❌ "; }
+  
+  /* アクセシビリティ設定パネル */
+  .accessibility-panel {
+    position: fixed;
+    top: 50%;
+    right: 20px;
+    transform: translateY(-50%) translateX(320px);
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 20px;
+    min-width: 300px;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+    z-index: 1000;
+  }
+  
+  .accessibility-panel.show {
+    transform: translateY(-50%) translateX(0);
+  }
+  
+  .accessibility-toggle {
+    position: fixed;
+    bottom: 20px;
+    right: 140px;
+    background: #28a745;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    font-size: 20px;
+    cursor: pointer;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    transition: transform 0.2s ease;
+    z-index: 999;
+  }
+  
+  .accessibility-toggle:hover {
+    transform: scale(1.1);
+  }
+  
+  .accessibility-setting {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid transparent;
+  }
+  
+  .accessibility-setting:hover,
+  .accessibility-setting:focus-within {
+    background-color: var(--card-bg);
+    border-color: var(--border-color);
+  }
+  
+  /* 音声読み上げ対応 */
+  .speak-button {
+    background: none;
+    border: none;
+    color: var(--accent-color);
+    cursor: pointer;
+    font-size: 16px;
+    margin-left: 10px;
+  }
+  </style>
 </head>
 <body>
 
@@ -855,6 +1256,845 @@ function renderTimetable(id, sched, service, displayType, isToday, currentH, cur
 render();
 setInterval(render, 1000);
 activeTab = null;
+</script>
+<script>
+
+    // ダークモード機能
+    class DarkModeManager {
+      constructor() {
+        this.init();
+      }
+      
+      init() {
+        // システム設定を確認
+        const savedTheme = localStorage.getItem('theme');
+        const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        
+        if (savedTheme) {
+          this.setTheme(savedTheme);
+        } else if (systemDark) {
+          this.setTheme('dark');
+        }
+        
+        // 切り替えボタン追加
+        this.createToggleButton();
+        
+        // システム設定変更を監視
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+          if (!localStorage.getItem('theme')) {
+            this.setTheme(e.matches ? 'dark' : 'light');
+          }
+        });
+      }
+      
+      setTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        localStorage.setItem('theme', theme);
+        this.updateToggleButton(theme);
+      }
+      
+      toggleTheme() {
+        const current = document.documentElement.getAttribute('data-theme');
+        const newTheme = current === 'dark' ? 'light' : 'dark';
+        this.setTheme(newTheme);
+      }
+      
+      createToggleButton() {
+        const button = document.createElement('button');
+        button.className = 'theme-toggle';
+        button.innerHTML = '🌙';
+        button.title = 'ダークモード切り替え';
+        button.onclick = () => this.toggleTheme();
+        document.body.appendChild(button);
+        this.toggleButton = button;
+      }
+      
+      updateToggleButton(theme) {
+        if (this.toggleButton) {
+          this.toggleButton.innerHTML = theme === 'dark' ? '☀️' : '🌙';
+          this.toggleButton.title = theme === 'dark' ? 'ライトモードに切り替え' : 'ダークモードに切り替え';
+        }
+      }
+    }
+    
+    // ダークモード初期化
+    window.addEventListener('DOMContentLoaded', () => {
+      new DarkModeManager();
+    });
+    
+</script>
+<script>
+
+    // お気に入り停留所機能
+    class FavoritesManager {
+      constructor() {
+        this.favorites = JSON.parse(localStorage.getItem('busFavorites') || '[]');
+        this.init();
+      }
+      
+      init() {
+        this.createFavoritesPanel();
+        this.renderFavorites();
+        this.addFavoriteButtons();
+      }
+      
+      createFavoritesPanel() {
+        // 既存の要素の後にお気に入りパネルを挿入
+        const container = document.querySelector('.container') || document.body;
+        const panel = document.createElement('div');
+        panel.innerHTML = `
+    <!-- お気に入り停留所パネル -->
+    <div class="favorites-panel" id="favoritesPanel">
+      <div class="favorites-header">
+        <h5>⭐ お気に入り停留所</h5>
+        <button class="btn btn-sm btn-outline-secondary" id="editFavoritesBtn">編集</button>
+      </div>
+      <div class="favorites-list" id="favoritesList">
+        <!-- お気に入りがここに表示されます -->
+      </div>
+    </div>
+    `;
+        container.insertBefore(panel.firstElementChild, container.firstElementChild);
+        
+        // 編集ボタンのイベント
+        document.getElementById('editFavoritesBtn').addEventListener('click', () => {
+          this.toggleEditMode();
+        });
+        
+        // お気に入りが存在する場合のみパネル表示
+        if (this.favorites.length > 0) {
+          document.getElementById('favoritesPanel').classList.add('show');
+        }
+      }
+      
+      renderFavorites() {
+        const list = document.getElementById('favoritesList');
+        if (!list) return;
+        
+        list.innerHTML = this.favorites.map(fav => `
+          <a href="#" class="favorite-item" data-stop="${fav.id}">
+            ${fav.name}
+            <span class="remove-btn" data-remove="${fav.id}" style="display: none;">✕</span>
+          </a>
+        `).join('');
+        
+        // クリックイベント
+        list.querySelectorAll('.favorite-item').forEach(item => {
+          item.addEventListener('click', (e) => {
+            if (e.target.classList.contains('remove-btn')) {
+              this.removeFavorite(e.target.dataset.remove);
+            } else {
+              this.selectStop(item.dataset.stop);
+            }
+          });
+        });
+      }
+      
+      addFavoriteButtons() {
+        // 停留所選択エリアにお気に入りボタンを追加
+        const stopSelects = document.querySelectorAll('select, input');
+        stopSelects.forEach(select => {
+          if (select.id && select.id.includes('stop') || select.className.includes('stop')) {
+            this.addFavoriteButton(select);
+          }
+        });
+      }
+      
+      addFavoriteButton(element) {
+        const container = element.parentElement;
+        if (container.style.position !== 'relative') {
+          container.style.position = 'relative';
+        }
+        
+        const button = document.createElement('button');
+        button.className = 'add-favorite-btn';
+        button.innerHTML = '⭐';
+        button.title = 'お気に入りに追加';
+        button.onclick = (e) => {
+          e.preventDefault();
+          this.addCurrentStop();
+        };
+        
+        container.appendChild(button);
+      }
+      
+      addCurrentStop() {
+        // 現在選択されている停留所を取得
+        const currentStop = this.getCurrentStopInfo();
+        if (currentStop && !this.favorites.find(f => f.id === currentStop.id)) {
+          this.favorites.push(currentStop);
+          this.saveFavorites();
+          this.renderFavorites();
+          
+          // パネル表示
+          document.getElementById('favoritesPanel').classList.add('show');
+          
+          // 成功メッセージ
+          this.showMessage(`⭐ ${currentStop.name} をお気に入りに追加しました`);
+        }
+      }
+      
+      getCurrentStopInfo() {
+        // 現在のページ状態から停留所情報を取得（アプリに合わせて調整）
+        return {
+          id: Date.now().toString(),
+          name: '現在の停留所' // 実際のアプリに合わせて修正
+        };
+      }
+      
+      removeFavorite(id) {
+        this.favorites = this.favorites.filter(f => f.id !== id);
+        this.saveFavorites();
+        this.renderFavorites();
+        
+        if (this.favorites.length === 0) {
+          document.getElementById('favoritesPanel').classList.remove('show');
+        }
+      }
+      
+      selectStop(id) {
+        const favorite = this.favorites.find(f => f.id === id);
+        if (favorite) {
+          // 選択された停留所に切り替え（アプリに合わせて実装）
+          this.showMessage(`🚌 ${favorite.name} の時刻表を表示`);
+        }
+      }
+      
+      toggleEditMode() {
+        const removeButtons = document.querySelectorAll('.remove-btn');
+        const isEditing = removeButtons[0]?.style.display !== 'none';
+        
+        removeButtons.forEach(btn => {
+          btn.style.display = isEditing ? 'none' : 'inline';
+        });
+        
+        const editBtn = document.getElementById('editFavoritesBtn');
+        editBtn.textContent = isEditing ? '編集' : '完了';
+      }
+      
+      saveFavorites() {
+        localStorage.setItem('busFavorites', JSON.stringify(this.favorites));
+      }
+      
+      showMessage(text) {
+        // 簡易メッセージ表示
+        const msg = document.createElement('div');
+        msg.style.cssText = `
+          position: fixed; top: 80px; right: 20px; z-index: 1001;
+          background: var(--accent-color); color: white;
+          padding: 10px 15px; border-radius: 5px;
+          font-size: 14px; opacity: 0; transition: opacity 0.3s ease;
+        `;
+        msg.textContent = text;
+        document.body.appendChild(msg);
+        
+        setTimeout(() => msg.style.opacity = '1', 10);
+        setTimeout(() => {
+          msg.style.opacity = '0';
+          setTimeout(() => msg.remove(), 300);
+        }, 3000);
+      }
+    }
+    
+    // お気に入り機能初期化
+    window.addEventListener('DOMContentLoaded', () => {
+      setTimeout(() => new FavoritesManager(), 100);
+    });
+    
+</script>
+<script>
+
+  // 通知機能
+  class NotificationManager {
+    constructor() {
+      this.notifications = JSON.parse(localStorage.getItem('busNotifications') || '[]');
+      this.permission = Notification.permission;
+      this.init();
+    }
+    
+    async init() {
+      this.createNotificationUI();
+      this.checkPermission();
+      this.startScheduler();
+      this.updateBadge();
+    }
+    
+    async checkPermission() {
+      if (this.permission === 'default') {
+        this.permission = await Notification.requestPermission();
+      }
+    }
+    
+    createNotificationUI() {
+      // 通知切り替えボタン
+      const toggleBtn = document.createElement('button');
+      toggleBtn.className = 'notify-toggle';
+      toggleBtn.innerHTML = '🔔';
+      toggleBtn.title = '通知設定';
+      toggleBtn.onclick = () => this.togglePanel();
+      document.body.appendChild(toggleBtn);
+      this.toggleBtn = toggleBtn;
+      
+      // 通知パネル
+      const panel = document.createElement('div');
+      panel.className = 'notification-panel';
+      panel.id = 'notificationPanel';
+      panel.innerHTML = `
+        <div class="notification-header">
+          <h6>🔔 バス通知設定</h6>
+          <button class="btn btn-sm btn-outline-secondary" onclick="this.parentElement.parentElement.classList.remove('show')">✕</button>
+        </div>
+        
+        <div class="notification-setting">
+          <label>通知を有効にする</label>
+          <input type="checkbox" id="enableNotifications" ${this.isEnabled() ? 'checked' : ''}>
+        </div>
+        
+        <div class="notification-setting">
+          <label>バス接近通知 (分前)</label>
+          <select id="notifyMinutes" class="time-input">
+            <option value="5">5分前</option>
+            <option value="10" selected>10分前</option>
+            <option value="15">15分前</option>
+            <option value="20">20分前</option>
+          </select>
+        </div>
+        
+        <div class="notification-setting">
+          <label>時刻指定通知</label>
+          <div class="time-input-group">
+            <input type="time" id="customNotifyTime" class="time-input">
+            <button class="btn btn-sm btn-primary" onclick="notificationManager.addCustomNotification()">追加</button>
+          </div>
+        </div>
+        
+        <div id="customNotificationsList"></div>
+        
+        <div class="notification-setting" style="margin-top: 15px;">
+          <button class="btn btn-sm btn-success" onclick="notificationManager.testNotification()">テスト通知</button>
+          <button class="btn btn-sm btn-outline-danger" onclick="notificationManager.clearAll()">全て削除</button>
+        </div>
+      `;
+      
+      document.body.appendChild(panel);
+      
+      // イベントリスナー
+      document.getElementById('enableNotifications').onchange = (e) => {
+        this.setEnabled(e.target.checked);
+      };
+      
+      document.getElementById('notifyMinutes').onchange = (e) => {
+        this.setNotifyMinutes(parseInt(e.target.value));
+      };
+      
+      this.renderCustomNotifications();
+    }
+    
+    togglePanel() {
+      const panel = document.getElementById('notificationPanel');
+      panel.classList.toggle('show');
+    }
+    
+    isEnabled() {
+      return localStorage.getItem('busNotificationsEnabled') === 'true';
+    }
+    
+    setEnabled(enabled) {
+      localStorage.setItem('busNotificationsEnabled', enabled);
+      if (enabled) {
+        this.checkPermission();
+      }
+      this.updateBadge();
+    }
+    
+    setNotifyMinutes(minutes) {
+      localStorage.setItem('busNotifyMinutes', minutes);
+    }
+    
+    getNotifyMinutes() {
+      return parseInt(localStorage.getItem('busNotifyMinutes') || '10');
+    }
+    
+    addCustomNotification() {
+      const timeInput = document.getElementById('customNotifyTime');
+      const time = timeInput.value;
+      
+      if (time) {
+        const notification = {
+          id: Date.now(),
+          time: time,
+          enabled: true,
+          repeat: 'daily'
+        };
+        
+        this.notifications.push(notification);
+        this.saveNotifications();
+        this.renderCustomNotifications();
+        this.updateBadge();
+        
+        timeInput.value = '';
+        this.showToast(`⏰ ${time} の通知を追加しました`);
+      }
+    }
+    
+    removeNotification(id) {
+      this.notifications = this.notifications.filter(n => n.id !== id);
+      this.saveNotifications();
+      this.renderCustomNotifications();
+      this.updateBadge();
+    }
+    
+    renderCustomNotifications() {
+      const list = document.getElementById('customNotificationsList');
+      if (!list) return;
+      
+      list.innerHTML = this.notifications.map(notif => `
+        <div class="notification-setting" style="font-size: 14px;">
+          <span>⏰ ${notif.time}</span>
+          <button class="btn btn-sm btn-outline-danger" onclick="notificationManager.removeNotification(${notif.id})">削除</button>
+        </div>
+      `).join('');
+    }
+    
+    saveNotifications() {
+      localStorage.setItem('busNotifications', JSON.stringify(this.notifications));
+    }
+    
+    updateBadge() {
+      const hasActive = this.isEnabled() && (this.notifications.length > 0);
+      
+      if (hasActive && !this.toggleBtn.querySelector('.notify-badge')) {
+        const badge = document.createElement('span');
+        badge.className = 'notify-badge';
+        badge.textContent = this.notifications.length;
+        this.toggleBtn.appendChild(badge);
+      } else if (!hasActive && this.toggleBtn.querySelector('.notify-badge')) {
+        this.toggleBtn.querySelector('.notify-badge').remove();
+      }
+    }
+    
+    startScheduler() {
+      // 1分ごとに通知チェック
+      setInterval(() => {
+        if (this.isEnabled()) {
+          this.checkScheduledNotifications();
+        }
+      }, 60000); // 1分
+    }
+    
+    checkScheduledNotifications() {
+      const now = new Date();
+      const currentTime = now.getHours().toString().padStart(2, '0') + ':' + 
+                         now.getMinutes().toString().padStart(2, '0');
+      
+      this.notifications.forEach(notif => {
+        if (notif.enabled && notif.time === currentTime) {
+          this.sendNotification('🚌 バス時刻表', {
+            body: `${notif.time} の通知時刻です。次のバスを確認してください。`,
+            icon: '/apple-touch-icon.png',
+            tag: 'bus-scheduled-' + notif.id
+          });
+        }
+      });
+    }
+    
+    async sendNotification(title, options = {}) {
+      if (this.permission === 'granted') {
+        try {
+          const notification = new Notification(title, {
+            icon: '/apple-touch-icon.png',
+            badge: '/apple-touch-icon.png',
+            ...options
+          });
+          
+          notification.onclick = () => {
+            window.focus();
+            notification.close();
+          };
+          
+          // 5秒後に自動閉じ
+          setTimeout(() => notification.close(), 5000);
+          
+        } catch (error) {
+          console.log('通知エラー:', error);
+          this.showToast('通知の送信に失敗しました');
+        }
+      }
+    }
+    
+    testNotification() {
+      this.sendNotification('🚌 テスト通知', {
+        body: 'バス通知が正常に動作しています！',
+        tag: 'bus-test'
+      });
+      this.showToast('テスト通知を送信しました');
+    }
+    
+    showToast(message) {
+      const toast = document.createElement('div');
+      toast.className = 'notification-toast';
+      toast.textContent = message;
+      document.body.appendChild(toast);
+      
+      setTimeout(() => toast.classList.add('show'), 10);
+      setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+    
+    clearAll() {
+      if (confirm('全ての通知設定を削除しますか？')) {
+        this.notifications = [];
+        this.saveNotifications();
+        this.renderCustomNotifications();
+        this.updateBadge();
+        this.showToast('通知設定を全て削除しました');
+      }
+    }
+    
+    // 次のバス接近通知（バス時刻表データと連携）
+    notifyUpcomingBus(busTime, minutesAway) {
+      const notifyMinutes = this.getNotifyMinutes();
+      
+      if (this.isEnabled() && minutesAway <= notifyMinutes) {
+        this.sendNotification('🚌 バス接近中', {
+          body: `${busTime} のバスが約 ${minutesAway} 分後に到着します`,
+          tag: 'bus-approaching-' + busTime.replace(':', '')
+        });
+      }
+    }
+  }
+  
+  // 通知機能初期化
+  let notificationManager;
+  window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+      notificationManager = new NotificationManager();
+    }, 200);
+  });
+  
+</script>
+<script>
+
+  // アクセシビリティ機能
+  class AccessibilityManager {
+    constructor() {
+      this.settings = JSON.parse(localStorage.getItem('accessibilitySettings') || '{}');
+      this.synthesis = window.speechSynthesis;
+      this.init();
+    }
+    
+    init() {
+      this.createAccessibilityUI();
+      this.setupKeyboardNavigation();
+      this.applySettings();
+      this.addARIALabels();
+      this.setupSpeechSupport();
+    }
+    
+    createAccessibilityUI() {
+      // アクセシビリティ切り替えボタン
+      const toggleBtn = document.createElement('button');
+      toggleBtn.className = 'accessibility-toggle';
+      toggleBtn.innerHTML = '♿';
+      toggleBtn.title = 'アクセシビリティ設定';
+      toggleBtn.setAttribute('aria-label', 'アクセシビリティ設定を開く');
+      toggleBtn.onclick = () => this.togglePanel();
+      document.body.appendChild(toggleBtn);
+      
+      // アクセシビリティパネル
+      const panel = document.createElement('div');
+      panel.className = 'accessibility-panel';
+      panel.id = 'accessibilityPanel';
+      panel.setAttribute('role', 'dialog');
+      panel.setAttribute('aria-labelledby', 'accessibility-title');
+      panel.innerHTML = `
+        <div class="accessibility-header">
+          <h5 id="accessibility-title">♿ アクセシビリティ設定</h5>
+          <button class="btn btn-sm btn-outline-secondary" onclick="this.parentElement.parentElement.classList.remove('show')" aria-label="設定パネルを閉じる">✕</button>
+        </div>
+        
+        <div class="accessibility-setting">
+          <label for="largeText">大きな文字</label>
+          <input type="checkbox" id="largeText" ${this.settings.largeText ? 'checked' : ''}>
+        </div>
+        
+        <div class="accessibility-setting">
+          <label for="highContrast">高コントラスト</label>
+          <input type="checkbox" id="highContrast" ${this.settings.highContrast ? 'checked' : ''}>
+        </div>
+        
+        <div class="accessibility-setting">
+          <label for="reduceMotion">アニメーション削減</label>
+          <input type="checkbox" id="reduceMotion" ${this.settings.reduceMotion ? 'checked' : ''}>
+        </div>
+        
+        <div class="accessibility-setting">
+          <label for="keyboardNavigation">キーボードナビゲーション</label>
+          <input type="checkbox" id="keyboardNavigation" ${this.settings.keyboardNavigation ? 'checked' : ''}>
+        </div>
+        
+        <div class="accessibility-setting">
+          <label for="speechEnabled">音声読み上げ</label>
+          <input type="checkbox" id="speechEnabled" ${this.settings.speechEnabled ? 'checked' : ''}>
+        </div>
+        
+        <div class="accessibility-setting">
+          <label for="speechRate">読み上げ速度</label>
+          <select id="speechRate">
+            <option value="0.5" ${this.settings.speechRate === 0.5 ? 'selected' : ''}>ゆっくり</option>
+            <option value="1" ${(this.settings.speechRate || 1) === 1 ? 'selected' : ''}>普通</option>
+            <option value="1.5" ${this.settings.speechRate === 1.5 ? 'selected' : ''}>早い</option>
+            <option value="2" ${this.settings.speechRate === 2 ? 'selected' : ''}>とても早い</option>
+          </select>
+        </div>
+        
+        <div class="accessibility-setting">
+          <button class="btn btn-sm btn-success" onclick="accessibilityManager.testSpeech()">音声テスト</button>
+          <button class="btn btn-sm btn-outline-danger" onclick="accessibilityManager.resetSettings()">設定リセット</button>
+        </div>
+      `;
+      
+      document.body.appendChild(panel);
+      
+      // イベントリスナー設定
+      this.setupEventListeners();
+    }
+    
+    setupEventListeners() {
+      const settings = ['largeText', 'highContrast', 'reduceMotion', 'keyboardNavigation', 'speechEnabled'];
+      
+      settings.forEach(setting => {
+        const element = document.getElementById(setting);
+        if (element) {
+          element.onchange = (e) => {
+            this.updateSetting(setting, e.target.checked);
+          };
+        }
+      });
+      
+      const speechRate = document.getElementById('speechRate');
+      if (speechRate) {
+        speechRate.onchange = (e) => {
+          this.updateSetting('speechRate', parseFloat(e.target.value));
+        };
+      }
+    }
+    
+    updateSetting(key, value) {
+      this.settings[key] = value;
+      localStorage.setItem('accessibilitySettings', JSON.stringify(this.settings));
+      this.applySettings();
+    }
+    
+    applySettings() {
+      const body = document.body;
+      
+      // 大きな文字
+      if (this.settings.largeText) {
+        body.classList.add('large-text');
+      } else {
+        body.classList.remove('large-text');
+      }
+      
+      // 高コントラスト
+      if (this.settings.highContrast) {
+        body.classList.add('high-contrast');
+      } else {
+        body.classList.remove('high-contrast');
+      }
+      
+      // アニメーション削減
+      if (this.settings.reduceMotion) {
+        body.classList.add('reduce-motion');
+      } else {
+        body.classList.remove('reduce-motion');
+      }
+      
+      // キーボードナビゲーション
+      if (this.settings.keyboardNavigation) {
+        body.classList.add('keyboard-navigation');
+        this.enableKeyboardNavigation();
+      } else {
+        body.classList.remove('keyboard-navigation');
+      }
+    }
+    
+    setupKeyboardNavigation() {
+      // Tab キーでフォーカス移動を改善
+      document.addEventListener('keydown', (e) => {
+        if (!this.settings.keyboardNavigation) return;
+        
+        switch(e.key) {
+          case 'Tab':
+            this.highlightFocusableElements();
+            break;
+          case 'Enter':
+          case ' ':
+            if (e.target.classList.contains('focusable')) {
+              e.target.click();
+            }
+            break;
+          case 'Escape':
+            this.closeAllPanels();
+            break;
+        }
+      });
+      
+      // フォーカス可能な要素にクラスを追加
+      this.markFocusableElements();
+    }
+    
+    markFocusableElements() {
+      const focusableSelectors = [
+        'button', 'input', 'select', 'textarea', 'a[href]',
+        '[tabindex]:not([tabindex="-1"])'
+      ];
+      
+      focusableSelectors.forEach(selector => {
+        document.querySelectorAll(selector).forEach(el => {
+          el.classList.add('focusable');
+        });
+      });
+    }
+    
+    enableKeyboardNavigation() {
+      // より目立つフォーカス表示
+      const style = document.createElement('style');
+      style.textContent = `
+        .keyboard-navigation .focusable:focus {
+          outline: 3px solid var(--accent-color) !important;
+          outline-offset: 2px !important;
+          box-shadow: 0 0 10px rgba(0, 123, 255, 0.3) !important;
+        }
+      `;
+      document.head.appendChild(style);
+    }
+    
+    addARIALabels() {
+      // 既存の要素にARIA属性を追加
+      setTimeout(() => {
+        const buttons = document.querySelectorAll('button:not([aria-label])');
+        buttons.forEach((btn, index) => {
+          if (!btn.getAttribute('aria-label')) {
+            const text = btn.textContent.trim() || btn.innerHTML.trim();
+            if (text) {
+              btn.setAttribute('aria-label', text);
+            }
+          }
+        });
+        
+        // 時刻表示エリアにaria-live属性追加
+        const timeElements = document.querySelectorAll('.time, .next-bus, .current-time');
+        timeElements.forEach(el => {
+          el.setAttribute('aria-live', 'polite');
+          el.setAttribute('aria-atomic', 'true');
+        });
+        
+        // メインコンテンツエリアにrole属性
+        const main = document.querySelector('main') || document.querySelector('.container');
+        if (main && !main.getAttribute('role')) {
+          main.setAttribute('role', 'main');
+        }
+        
+      }, 500);
+    }
+    
+    setupSpeechSupport() {
+      if (!this.synthesis) return;
+      
+      // 音声読み上げボタンを時刻表示の近くに追加
+      setTimeout(() => {
+        const timeElements = document.querySelectorAll('.next-bus, .bus-time');
+        timeElements.forEach(el => {
+          const speakBtn = document.createElement('button');
+          speakBtn.className = 'speak-button';
+          speakBtn.innerHTML = '🔊';
+          speakBtn.title = '音声で読み上げ';
+          speakBtn.setAttribute('aria-label', '時刻を音声で読み上げ');
+          speakBtn.onclick = (e) => {
+            e.stopPropagation();
+            this.speak(el.textContent);
+          };
+          el.appendChild(speakBtn);
+        });
+      }, 1000);
+    }
+    
+    speak(text) {
+      if (!this.settings.speechEnabled || !this.synthesis) return;
+      
+      // 進行中の読み上げを停止
+      this.synthesis.cancel();
+      
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = this.settings.speechRate || 1;
+      utterance.lang = 'ja-JP';
+      
+      this.synthesis.speak(utterance);
+    }
+    
+    testSpeech() {
+      this.speak('音声読み上げのテストです。バス時刻表アプリをご利用いただき、ありがとうございます。');
+    }
+    
+    togglePanel() {
+      const panel = document.getElementById('accessibilityPanel');
+      const isOpen = panel.classList.contains('show');
+      
+      if (isOpen) {
+        panel.classList.remove('show');
+        panel.setAttribute('aria-hidden', 'true');
+      } else {
+        panel.classList.add('show');
+        panel.setAttribute('aria-hidden', 'false');
+        // フォーカスを最初の設定項目に移動
+        const firstInput = panel.querySelector('input');
+        if (firstInput) {
+          setTimeout(() => firstInput.focus(), 300);
+        }
+      }
+    }
+    
+    closeAllPanels() {
+      document.querySelectorAll('.panel.show, .notification-panel.show, .accessibility-panel.show').forEach(panel => {
+        panel.classList.remove('show');
+        panel.setAttribute('aria-hidden', 'true');
+      });
+    }
+    
+    resetSettings() {
+      if (confirm('アクセシビリティ設定を初期状態に戻しますか？')) {
+        this.settings = {};
+        localStorage.removeItem('accessibilitySettings');
+        location.reload();
+      }
+    }
+    
+    // 自動読み上げ機能（重要な情報が更新された時）
+    announceUpdate(message) {
+      if (this.settings.speechEnabled) {
+        setTimeout(() => this.speak(message), 500);
+      }
+    }
+  }
+  
+  // アクセシビリティ機能初期化
+  let accessibilityManager;
+  window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+      accessibilityManager = new AccessibilityManager();
+    }, 300);
+  });
+  
+  // グローバル関数として追加（他のスクリプトから使用可能）
+  window.announceToScreenReader = function(message) {
+    if (accessibilityManager) {
+      accessibilityManager.announceUpdate(message);
+    }
+  };
+  
 </script>
 </body>
 </html>
