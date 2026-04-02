@@ -570,12 +570,12 @@
   </div>
 
   <div class="timetable-section">
-    <div class="tt-header to06">都06<span class="dest-note">銀座四丁目4番のりば発（有明一丁目行）</span><a href="https://tobus.jp/sp/blsys/stop/time?routecode=181&poleno=5&stopid=448&ln=ja" target="_blank" class="tt-source-link">時刻表サイト</a></div>
+    <div class="tt-header to06">都05-2<span class="dest-note">銀座四丁目4番のりば発（有明一丁目行）</span><a href="https://tobus.jp/sp/blsys/stop/time?routecode=181&poleno=5&stopid=448&ln=ja" target="_blank" class="tt-source-link">時刻表サイト</a></div>
     <div class="timetable" id="ttTo06"></div>
   </div>
 
   <div class="timetable-section">
-    <div class="tt-header r23">都23<span class="dest-note">銀座四丁目2番のりば発（晴海埠頭方面）</span><a href="https://tobus.jp/sp/blsys/stop/time?stopid=448&ud=1&poleno=8&ln=ja&routecode=23" target="_blank" class="tt-source-link">時刻表サイト</a></div>
+    <div class="tt-header r23">都03<span class="dest-note">銀座四丁目2番のりば発（晴海埠頭方面）</span><a href="https://tobus.jp/sp/blsys/stop/time?stopid=448&ud=1&poleno=8&ln=ja&routecode=23" target="_blank" class="tt-source-link">時刻表サイト</a></div>
     <div class="timetable" id="ttR23"></div>
   </div>
 
@@ -785,9 +785,9 @@ function schedToList(sched, service, dayType) {
       if (service === 'liner') dest = linerDest(h, m, dayType);
       else if (service === 'brt') dest = brtDest(h, m, dayType);
       else if (service === 'tiaro') dest = tiaroDest(h, m);
-      else if (service === 'to051') dest = '晴海埠頭';
-      else if (service === 'to06') dest = '有明一丁目';
-      else if (service === 'r23') dest = '晴海埠頭方面';
+      else if (service === 'to051') dest = '晴海埠頭（2番のりば）';
+      else if (service === 'to06') dest = '有明一丁目（4番のりば）';
+      else if (service === 'r23') dest = '晴海埠頭方面（2番のりば）';
       else if (service === 'gtiaro') dest = 'ティアロ';
       else if (service === 'brtSb') dest = brtSbDest(h, m, dayType);
       else dest = shuttleDest(h, m);
@@ -916,8 +916,8 @@ function svcLabel(svc) {
   if (svc === 'brt') return 'BRT';
   if (svc === 'tiaro') return 'ティアロ';
   if (svc === 'to051') return '都05-1';
-  if (svc === 'to06') return '都06';
-  if (svc === 'r23') return '都23';
+  if (svc === 'to06') return '都05-2';
+  if (svc === 'r23') return '都03';
   if (svc === 'gtiaro') return 'ティアロ';
   if (svc === 'brtSb') return 'BRT';
   return 'クロノ';
@@ -928,8 +928,8 @@ function svcFullLabel(svc) {
   if (svc === 'brt') return '東京BRT';
   if (svc === 'tiaro') return '住民バス（ティアロ）';
   if (svc === 'to051') return '都05-1 晴海埠頭行';
-  if (svc === 'to06') return '都06 有明一丁目行';
-  if (svc === 'r23') return '都23 晴海埠頭方面';
+  if (svc === 'to06') return '都05-2 有明一丁目行';
+  if (svc === 'r23') return '都03 晴海埠頭方面';
   if (svc === 'gtiaro') return '住民バス（ティアロ行き）';
   if (svc === 'brtSb') return '東京BRT（晴海・豊洲ルート）';
   return '住民バス（クロノ）';
