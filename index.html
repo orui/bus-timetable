@@ -25,6 +25,12 @@
     --brt: #00897b;
     --shuttle: #e67c00;
     --shuttle-light: #fff3e0;
+    --to051: #c62828;
+    --to051-light: #ffebee;
+    --to06: #6a1b9a;
+    --to06-light: #f3e5f5;
+    --r23: #0277bd;
+    --r23-light: #e1f5fe;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
@@ -319,7 +325,11 @@
   .tt-min.special.next-liner,
   .tt-min.special.next-brt,
   .tt-min.special.next-shuttle,
-  .tt-min.special.next-tiaro { border-color: transparent; }
+  .tt-min.special.next-tiaro,
+  .tt-min.special.next-to051,
+  .tt-min.special.next-to06,
+  .tt-min.special.next-r23,
+  .tt-min.special.next-gtiaro { border-color: transparent; }
   @keyframes pop { 0%{transform:scale(.6)} 60%{transform:scale(1.1)} 100%{transform:scale(1)} }
 
   .legend {
@@ -393,6 +403,72 @@
   }
   .sim-badge.hidden { display: none; }
 
+  /* Page tabs */
+  .page-tabs {
+    display: flex;
+    gap: 4px;
+    background: var(--card);
+    border-radius: 12px;
+    padding: 4px;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 4px rgba(0,0,0,.08);
+  }
+  .page-tab {
+    flex: 1;
+    padding: 10px;
+    text-align: center;
+    font-size: 15px;
+    font-weight: 700;
+    border: none;
+    border-radius: 9px;
+    cursor: pointer;
+    background: transparent;
+    color: var(--sub);
+    transition: all .2s;
+  }
+  .page-tab.active {
+    background: #1a3a5c;
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,.15);
+  }
+
+  /* Ginza route colors */
+  .tt-header.to051 { background: var(--to051); }
+  .tt-header.to06 { background: var(--to06); }
+  .tt-header.r23 { background: var(--r23); }
+  .tt-hour.to051 { color: var(--to051); }
+  .tt-hour.to06 { color: var(--to06); }
+  .tt-hour.r23 { color: var(--r23); }
+  .hero-accent.to051 { background: var(--to051); }
+  .hero-accent.to06 { background: var(--to06); }
+  .hero-accent.r23 { background: var(--r23); }
+  .hero-service.to051 { background: var(--to051-light); color: var(--to051); }
+  .hero-service.to06 { background: var(--to06-light); color: var(--to06); }
+  .hero-service.r23 { background: var(--r23-light); color: var(--r23); }
+  .upcoming-svc.to051 { background: var(--to051-light); color: var(--to051); }
+  .upcoming-svc.to06 { background: var(--to06-light); color: var(--to06); }
+  .upcoming-svc.r23 { background: var(--r23-light); color: var(--r23); }
+  .tt-row.current-to051 { background: var(--to051-light); }
+  .tt-row.current-to06 { background: var(--to06-light); }
+  .tt-row.current-r23 { background: var(--r23-light); }
+  .tt-min.next-to051 { background: var(--to051); color: #fff; font-weight: 700; box-shadow: 0 2px 8px rgba(198,40,40,.3); animation: pop .4s ease; }
+  .tt-min.next-to06 { background: var(--to06); color: #fff; font-weight: 700; box-shadow: 0 2px 8px rgba(106,27,154,.3); animation: pop .4s ease; }
+  .tt-min.next-r23 { background: var(--r23); color: #fff; font-weight: 700; box-shadow: 0 2px 8px rgba(2,119,189,.3); animation: pop .4s ease; }
+  .tt-header.gtiaro { background: var(--shuttle); }
+  .tt-hour.gtiaro { color: var(--shuttle); }
+  .hero-accent.gtiaro { background: var(--shuttle); }
+  .hero-service.gtiaro { background: var(--shuttle-light); color: var(--shuttle); }
+  .upcoming-svc.gtiaro { background: var(--shuttle-light); color: var(--shuttle); }
+  .tt-row.current-gtiaro { background: var(--shuttle-light); }
+  .tt-min.next-gtiaro { background: var(--shuttle); color: #fff; font-weight: 700; box-shadow: 0 2px 8px rgba(230,124,0,.3); animation: pop .4s ease; }
+  .tt-header.brtSb { background: var(--brt); }
+  .tt-hour.brtSb { color: var(--brt); }
+  .hero-accent.brtSb { background: var(--brt); }
+  .hero-service.brtSb { background: var(--green-light); color: var(--brt); }
+  .upcoming-svc.brtSb { background: var(--green-light); color: var(--brt); }
+  .tt-row.current-brtSb { background: var(--green-light); }
+  .tt-min.next-brtSb { background: var(--brt); color: #fff; font-weight: 700; box-shadow: 0 2px 8px rgba(0,137,123,.3); animation: pop .4s ease; }
+
   .footer {
     text-align: center;
     font-size: 11px;
@@ -406,12 +482,18 @@
 
 <header>
   <div class="header-row">
-    <h1>🚌 晴海バス時刻表</h1>
+    <h1>🚌 バス時刻表</h1>
     <span class="day-badge" id="dayBadge"></span>
   </div>
 </header>
 
 <div class="container">
+  <div class="page-tabs">
+    <button class="page-tab active" data-page="harumi" onclick="switchPage('harumi')">晴海発</button>
+    <button class="page-tab" data-page="ginza" onclick="switchPage('ginza')">銀座発</button>
+    <button class="page-tab" data-page="shimbashi" onclick="switchPage('shimbashi')">新橋発</button>
+  </div>
+
   <div class="time-picker">
     <label>日時指定</label>
     <input type="date" id="simDate" onchange="onSimChange()">
@@ -419,6 +501,7 @@
     <button class="btn-now hidden" id="btnNow" onclick="clearSim()">現在に戻す</button>
   </div>
 
+  <div id="harumiPage">
   <div class="hero">
     <div class="hero-accent" id="heroAccent"></div>
     <div class="hero-label">次のバス<span class="sim-badge hidden" id="simBadge">指定時刻</span></div>
@@ -435,8 +518,8 @@
   <div class="upcoming" id="upcomingList"></div>
 
   <div class="tabs">
-    <button class="tab active" data-type="weekday" onclick="switchTab('weekday')">平日</button>
-    <button class="tab" data-type="weekend" onclick="switchTab('weekend')">土休日</button>
+    <button class="tab active" data-page="harumi" data-type="weekday" onclick="switchTab('weekday')">平日</button>
+    <button class="tab" data-page="harumi" data-type="weekend" onclick="switchTab('weekend')">土休日</button>
   </div>
 
   <div class="timetable-section">
@@ -458,6 +541,76 @@
     <div class="tt-header tiaro">住民バス<span class="dest-note">ティアロ発（平日のみ）</span></div>
     <div class="timetable" id="ttTiaro"></div>
   </div>
+  </div><!-- /harumiPage -->
+
+  <div id="ginzaPage" style="display:none">
+  <div class="hero">
+    <div class="hero-accent" id="heroAccentG"></div>
+    <div class="hero-label">次のバス<span class="sim-badge hidden" id="simBadgeG">指定時刻</span></div>
+    <div class="hero-time" id="nextTimeG">--:--</div>
+    <div class="hero-wait" id="nextWaitG">--</div>
+    <br>
+    <span class="hero-service" id="heroServiceG"></span>
+    <div class="hero-dest" id="heroDestG"></div>
+    <div class="hero-next-day" id="nextDayG"></div>
+    <div class="now-clock" id="nowClockG"></div>
+  </div>
+
+  <div class="section-title">この後のバス</div>
+  <div class="upcoming" id="upcomingListG"></div>
+
+  <div class="tabs">
+    <button class="tab active" data-page="ginza" data-type="weekday" onclick="switchTabG('weekday')">平日</button>
+    <button class="tab" data-page="ginza" data-type="weekend" onclick="switchTabG('weekend')">土曜・休日</button>
+  </div>
+
+  <div class="timetable-section">
+    <div class="tt-header to051">都05-1<span class="dest-note">銀座四丁目2番のりば発（晴海埠頭行）</span><a href="https://tobus.jp/sp/blsys/stop/time?routecode=184&poleno=8&stopid=448&ln=ja" target="_blank" class="tt-source-link">時刻表サイト</a></div>
+    <div class="timetable" id="ttTo051"></div>
+  </div>
+
+  <div class="timetable-section">
+    <div class="tt-header to06">都06<span class="dest-note">銀座四丁目4番のりば発（有明一丁目行）</span><a href="https://tobus.jp/sp/blsys/stop/time?routecode=181&poleno=5&stopid=448&ln=ja" target="_blank" class="tt-source-link">時刻表サイト</a></div>
+    <div class="timetable" id="ttTo06"></div>
+  </div>
+
+  <div class="timetable-section">
+    <div class="tt-header r23">都23<span class="dest-note">銀座四丁目2番のりば発（晴海埠頭方面）</span><a href="https://tobus.jp/sp/blsys/stop/time?stopid=448&ud=1&poleno=8&ln=ja&routecode=23" target="_blank" class="tt-source-link">時刻表サイト</a></div>
+    <div class="timetable" id="ttR23"></div>
+  </div>
+
+  <div class="timetable-section" id="ginzaTiaroSection">
+    <div class="tt-header gtiaro">住民バス<span class="dest-note">銀座四丁目発（ティアロ行き・平日のみ）</span></div>
+    <div class="timetable" id="ttGTiaro"></div>
+  </div>
+  </div><!-- /ginzaPage -->
+
+  <div id="shimbashiPage" style="display:none">
+  <div class="hero">
+    <div class="hero-accent" id="heroAccentS"></div>
+    <div class="hero-label">次のバス<span class="sim-badge hidden" id="simBadgeS">指定時刻</span></div>
+    <div class="hero-time" id="nextTimeS">--:--</div>
+    <div class="hero-wait" id="nextWaitS">--</div>
+    <br>
+    <span class="hero-service" id="heroServiceS"></span>
+    <div class="hero-dest" id="heroDestS"></div>
+    <div class="hero-next-day" id="nextDayS"></div>
+    <div class="now-clock" id="nowClockS"></div>
+  </div>
+
+  <div class="section-title">この後のバス</div>
+  <div class="upcoming" id="upcomingListS"></div>
+
+  <div class="tabs">
+    <button class="tab active" data-page="shimbashi" data-type="weekday" onclick="switchTabS('weekday')">平日</button>
+    <button class="tab" data-page="shimbashi" data-type="weekend" onclick="switchTabS('weekend')">土休日</button>
+  </div>
+
+  <div class="timetable-section">
+    <div class="tt-header brt">東京BRT<span class="dest-note">新橋発（晴海・豊洲ルート）</span><a href="https://tokyo-brt.co.jp/bus-stops/b01-shimbashi" target="_blank" class="tt-source-link">時刻表サイト</a></div>
+    <div class="timetable" id="ttBrtSb"></div>
+  </div>
+  </div><!-- /shimbashiPage -->
 
   <div class="footer">毎秒自動更新</div>
 </div>
@@ -529,9 +682,95 @@ function tiaroDest(h, m) {
   return TIARO_DIRECT_WD.has(key) ? '東銀座直行' : '月島駅経由';
 }
 
+// ===== 銀座 都05-1 =====
+const TO051_WD = {
+  7:[5,16,28,39,49,58], 8:[7,15,23,31,40,48,57], 9:[6,15,23,32,41,49,57],
+  10:[5,13,21,30,39,49,59], 11:[10,20,30,40,51], 12:[1,10,18,26,35,44,53],
+  13:[2,11,20,29,38,47,56], 14:[5,14,24,34,44,54], 15:[4,14,24,34,44,54],
+  16:[4,14,24,34,45,55], 17:[4,13,22,31,39,46,54], 18:[2,10,19,27,37,46,56],
+  19:[7,17,28,38,48], 20:[0,12,25,39,54], 21:[7,20,34,47], 22:[1,18]
+};
+const TO051_WE = {
+  7:[3,17,32,46,59], 8:[10,20,30,40,50], 9:[1,12,22,32,44,54],
+  10:[4,14,24,34,46,56], 11:[6,16,26,36,46,56], 12:[6,15,24,33,42,51],
+  13:[0,10,20,30,41,51], 14:[1,11,21,31,42,52], 15:[2,12,22,32,42,52],
+  16:[2,12,21,30,39,48,57], 17:[6,14,23,32,40,50], 18:[0,10,21,32,41,52],
+  19:[3,14,26,37,48], 20:[0,12,25,38,51], 21:[4,17,31,46], 22:[2,19]
+};
+
+// ===== 銀座 都06 =====
+const TO06_WD = {
+  7:[19,36,51], 8:[5,17,27,36,46,55], 9:[4,12,20,28,36,44],
+  10:[0,8,16,24,32,41,49,57], 11:[4,12,21,34,42,50,58], 12:[6,14,22,30,38,46,58],
+  13:[6,14,22,30,38,46,54], 14:[2,10,18,26,34,42,50,58], 15:[6,14,22,34,42,58],
+  16:[6,14,22,30,38,46,54], 17:[1,8,15,22,30,38,45,53], 18:[1,16,30,37,51],
+  19:[7,15,31,40], 20:[5,14]
+};
+const TO06_WE = {
+  7:[26,41,56], 8:[11,24,33,42,51,59], 9:[7,15,23,31,40,48],
+  10:[4,12,20,28,36,46,54], 11:[2,10,18,28,36,44,52], 12:[0,8,16,24,32,40,48,56],
+  13:[4,12,20,28,36,45,52,59], 14:[6,13,20,27,34,44,52], 15:[0,8,16,24,32,40,48,56],
+  16:[14,22,30,46,54], 17:[2,10,17,23,29,44,52], 18:[1,19,37,45],
+  19:[3,13,34,53], 20:[4]
+};
+
+// ===== 銀座 住民バス（ティアロ行き・平日のみ）=====
+const GINZA_TIARO_WD = {
+  18:[30], 19:[5,40], 20:[13,43], 21:[13]
+};
+
+// ===== 新橋 東京BRT（晴海・豊洲ルート）=====
+const BRT_SB_WD = {
+  6:[0], 7:[5,20,35,55], 8:[15,30,45], 9:[5,20,40,55],
+  10:[15,30,50], 11:[5,25,40], 12:[0,15,35,50],
+  13:[10,25,45], 14:[0,20,35,55], 15:[10,30,45],
+  16:[5,20,40,55], 17:[15,30,50], 18:[5,25,40],
+  19:[0,10,30,45], 20:[0,20,40], 21:[0,20,40], 22:[0,20,42]
+};
+const BRT_SB_WE = {
+  6:[0,20,40], 7:[0,20,40], 8:[0,20,40], 9:[0,20,40],
+  10:[0,20,40], 11:[0,20,40], 12:[0,20,40], 13:[0,20,40],
+  14:[0,20,40], 15:[0,20,40], 16:[0,20,40], 17:[0,20,40],
+  18:[0,20,40], 19:[0,20,40], 20:[0,20,40], 21:[0,20,40],
+  22:[0,20,42]
+};
+// 晴海BRTターミナル止まり（豊洲まで行かない便）
+const BRT_SB_HARUMI_WD = new Set(['22:00']);
+const BRT_SB_HARUMI_WE = new Set(['6:00','22:00']);
+// 豊洲市場前行き
+const BRT_SB_TOYOSU_WD = new Set([
+  '7:05','7:20','7:35','7:55','8:15','9:20','9:40',
+  '11:05','11:25','12:00','13:10','13:45','14:00','14:35','14:55',
+  '15:30','16:05','16:40','17:30','18:05','18:25',
+  '19:00','19:45','20:00','21:40','22:20','22:42'
+]);
+const BRT_SB_TOYOSU_WE = new Set(['13:00','13:20','14:20','19:20','19:40','20:00','22:20','22:42']);
+
+function brtSbDest(h, m, dayType) {
+  const key = `${h}:${String(m).padStart(2,'0')}`;
+  if (dayType === 'weekend' ? BRT_SB_HARUMI_WE.has(key) : BRT_SB_HARUMI_WD.has(key))
+    return '晴海BRTターミナル止まり';
+  if (dayType === 'weekend' ? BRT_SB_TOYOSU_WE.has(key) : BRT_SB_TOYOSU_WD.has(key))
+    return '豊洲市場前';
+  return 'ミチノテラス豊洲';
+}
+
+// ===== 銀座 都23 =====
+const R23_WD = {
+  6:[55], 7:[35], 8:[25], 9:[6], 10:[7], 11:[12], 12:[12],
+  13:[2], 14:[2], 15:[3], 16:[8], 17:[8,58], 19:[3], 20:[28], 21:[57]
+};
+const R23_WE = {
+  7:[23], 8:[48], 10:[17], 11:[57], 12:[52], 13:[42], 14:[37],
+  15:[22], 16:[18,56], 18:[2], 19:[17], 20:[37], 21:[53]
+};
+
 // ===== Common =====
 let activeTab = null;
-let simDateTime = null; // Date object or null for live mode
+let activeTabG = null;
+let activeTabS = null;
+let activePage = 'harumi';
+let simDateTime = null;
 
 function getDayType(date) {
   const d = date.getDay();
@@ -546,6 +785,11 @@ function schedToList(sched, service, dayType) {
       if (service === 'liner') dest = linerDest(h, m, dayType);
       else if (service === 'brt') dest = brtDest(h, m, dayType);
       else if (service === 'tiaro') dest = tiaroDest(h, m);
+      else if (service === 'to051') dest = '晴海埠頭';
+      else if (service === 'to06') dest = '有明一丁目';
+      else if (service === 'r23') dest = '晴海埠頭方面';
+      else if (service === 'gtiaro') dest = 'ティアロ';
+      else if (service === 'brtSb') dest = brtSbDest(h, m, dayType);
       else dest = shuttleDest(h, m);
       times.push({ h, m, total: h*60+m, service, dest, dayType });
     }
@@ -560,7 +804,6 @@ function getAllBuses(dayType) {
     ...schedToList(lSched, 'liner', dayType),
     ...schedToList(bSched, 'brt', dayType)
   ];
-  // 住民バスは平日のみ
   if (dayType === 'weekday') {
     all.push(...schedToList(SHUTTLE_WD, 'shuttle', dayType));
     all.push(...schedToList(TIARO_WD, 'tiaro', dayType));
@@ -569,28 +812,80 @@ function getAllBuses(dayType) {
   return all;
 }
 
+function getAllBusesShimbashi(dayType) {
+  const sched = dayType === 'weekend' ? BRT_SB_WE : BRT_SB_WD;
+  return schedToList(sched, 'brtSb', dayType);
+}
+
+function getNextBusesShimbashi(now, count) {
+  const dayType = getDayType(now);
+  const current = now.getHours()*60 + now.getMinutes();
+  const all = getAllBusesShimbashi(dayType);
+  const upcoming = all.filter(t => t.total > current);
+  if (upcoming.length >= count) {
+    return upcoming.slice(0, count).map(t => ({ ...t, wait: t.total - current, isNextDay: false }));
+  }
+  const result = upcoming.map(t => ({ ...t, wait: t.total - current, isNextDay: false }));
+  const tomorrow = new Date(now);
+  tomorrow.setDate(tomorrow.getDate()+1);
+  const tAll = getAllBusesShimbashi(getDayType(tomorrow));
+  const remaining = count - result.length;
+  for (let i = 0; i < Math.min(remaining, tAll.length); i++) {
+    result.push({ ...tAll[i], wait: (24*60 - current) + tAll[i].total, isNextDay: true });
+  }
+  return result;
+}
+
+function getAllBusesGinza(dayType) {
+  const t051 = dayType === 'weekend' ? TO051_WE : TO051_WD;
+  const t06  = dayType === 'weekend' ? TO06_WE  : TO06_WD;
+  const r23  = dayType === 'weekend' ? R23_WE   : R23_WD;
+  const all = [
+    ...schedToList(t051, 'to051', dayType),
+    ...schedToList(t06,  'to06',  dayType),
+    ...schedToList(r23,  'r23',   dayType)
+  ];
+  if (dayType === 'weekday') {
+    all.push(...schedToList(GINZA_TIARO_WD, 'gtiaro', dayType));
+  }
+  all.sort((a,b) => a.total - b.total);
+  return all;
+}
+
 function getNextBuses(now, count) {
   const dayType = getDayType(now);
   const current = now.getHours()*60 + now.getMinutes();
   const all = getAllBuses(dayType);
   const upcoming = all.filter(t => t.total > current);
-
   if (upcoming.length >= count) {
     return upcoming.slice(0, count).map(t => ({ ...t, wait: t.total - current, isNextDay: false }));
   }
-  // Add tomorrow's first buses
   const result = upcoming.map(t => ({ ...t, wait: t.total - current, isNextDay: false }));
   const tomorrow = new Date(now);
   tomorrow.setDate(tomorrow.getDate()+1);
-  const tType = getDayType(tomorrow);
-  const tAll = getAllBuses(tType);
+  const tAll = getAllBuses(getDayType(tomorrow));
   const remaining = count - result.length;
   for (let i = 0; i < Math.min(remaining, tAll.length); i++) {
-    result.push({
-      ...tAll[i],
-      wait: (24*60 - current) + tAll[i].total,
-      isNextDay: true
-    });
+    result.push({ ...tAll[i], wait: (24*60 - current) + tAll[i].total, isNextDay: true });
+  }
+  return result;
+}
+
+function getNextBusesGinza(now, count) {
+  const dayType = getDayType(now);
+  const current = now.getHours()*60 + now.getMinutes();
+  const all = getAllBusesGinza(dayType);
+  const upcoming = all.filter(t => t.total > current);
+  if (upcoming.length >= count) {
+    return upcoming.slice(0, count).map(t => ({ ...t, wait: t.total - current, isNextDay: false }));
+  }
+  const result = upcoming.map(t => ({ ...t, wait: t.total - current, isNextDay: false }));
+  const tomorrow = new Date(now);
+  tomorrow.setDate(tomorrow.getDate()+1);
+  const tAll = getAllBusesGinza(getDayType(tomorrow));
+  const remaining = count - result.length;
+  for (let i = 0; i < Math.min(remaining, tAll.length); i++) {
+    result.push({ ...tAll[i], wait: (24*60 - current) + tAll[i].total, isNextDay: true });
   }
   return result;
 }
@@ -620,6 +915,11 @@ function svcLabel(svc) {
   if (svc === 'liner') return 'ライナー';
   if (svc === 'brt') return 'BRT';
   if (svc === 'tiaro') return 'ティアロ';
+  if (svc === 'to051') return '都05-1';
+  if (svc === 'to06') return '都06';
+  if (svc === 'r23') return '都23';
+  if (svc === 'gtiaro') return 'ティアロ';
+  if (svc === 'brtSb') return 'BRT';
   return 'クロノ';
 }
 
@@ -627,6 +927,11 @@ function svcFullLabel(svc) {
   if (svc === 'liner') return '晴海ライナー';
   if (svc === 'brt') return '東京BRT';
   if (svc === 'tiaro') return '住民バス（ティアロ）';
+  if (svc === 'to051') return '都05-1 晴海埠頭行';
+  if (svc === 'to06') return '都06 有明一丁目行';
+  if (svc === 'r23') return '都23 晴海埠頭方面';
+  if (svc === 'gtiaro') return '住民バス（ティアロ行き）';
+  if (svc === 'brtSb') return '東京BRT（晴海・豊洲ルート）';
   return '住民バス（クロノ）';
 }
 
@@ -656,52 +961,50 @@ function clearSim() {
   render();
 }
 
+function switchPage(page) {
+  activePage = page;
+  document.querySelectorAll('.page-tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.page === page);
+  });
+  document.getElementById('harumiPage').style.display    = page === 'harumi'    ? '' : 'none';
+  document.getElementById('ginzaPage').style.display     = page === 'ginza'     ? '' : 'none';
+  document.getElementById('shimbashiPage').style.display = page === 'shimbashi' ? '' : 'none';
+  render();
+}
+
 function switchTab(type) {
   activeTab = type;
-  document.querySelectorAll('.tab').forEach(t => {
+  document.querySelectorAll('.tab[data-page="harumi"]').forEach(t => {
     t.classList.toggle('active', t.dataset.type === type);
   });
   render();
 }
 
-function render() {
-  const realNow = new Date();
-  const isSim = simDateTime !== null;
+function switchTabG(type) {
+  activeTabG = type;
+  document.querySelectorAll('.tab[data-page="ginza"]').forEach(t => {
+    t.classList.toggle('active', t.dataset.type === type);
+  });
+  render();
+}
 
-  // Show/hide sim UI elements
-  document.getElementById('btnNow').classList.toggle('hidden', !isSim);
-  document.getElementById('simBadge').classList.toggle('hidden', !isSim);
+function switchTabS(type) {
+  activeTabS = type;
+  document.querySelectorAll('.tab[data-page="shimbashi"]').forEach(t => {
+    t.classList.toggle('active', t.dataset.type === type);
+  });
+  render();
+}
 
-  const now = isSim ? simDateTime : realNow;
-
-  const todayType = getDayType(now);
-  const currentH = now.getHours();
-  const currentM = now.getMinutes();
-  const currentTotal = currentH*60 + currentM;
-
-  document.getElementById('dayBadge').textContent =
-    todayType === 'weekend' ? '土休日ダイヤ' : '平日ダイヤ';
-
-  if (isSim) {
-    document.getElementById('nowClock').textContent =
-      `指定: ${fmtDate(now)} ${fmt(currentH, currentM)}`;
-  } else {
-    const sec = String(realNow.getSeconds()).padStart(2,'0');
-    document.getElementById('nowClock').textContent =
-      `${fmtDate(realNow)} ${fmt(currentH, currentM)}:${sec}`;
-  }
-
-  // Next buses (hero + 5 upcoming)
-  const buses = getNextBuses(now, 6);
+function updateHero(sfx, buses, clockText) {
   const next = buses[0] || null;
-
-  const heroAccent = document.getElementById('heroAccent');
-  const heroTime = document.getElementById('nextTime');
-  const heroWait = document.getElementById('nextWait');
-  const heroService = document.getElementById('heroService');
-  const heroDest = document.getElementById('heroDest');
-  const heroNextDay = document.getElementById('nextDay');
-
+  document.getElementById('nowClock' + sfx).textContent = clockText;
+  const heroAccent  = document.getElementById('heroAccent'  + sfx);
+  const heroTime    = document.getElementById('nextTime'    + sfx);
+  const heroWait    = document.getElementById('nextWait'    + sfx);
+  const heroService = document.getElementById('heroService' + sfx);
+  const heroDest    = document.getElementById('heroDest'    + sfx);
+  const heroNextDay = document.getElementById('nextDay'     + sfx);
   if (next) {
     heroAccent.className = 'hero-accent ' + next.service;
     heroTime.textContent = fmt(next.h, next.m);
@@ -710,7 +1013,8 @@ function render() {
       (next.wait <= 3 ? ' urgent' : next.wait <= 10 ? ' soon' : '');
     heroService.textContent = svcFullLabel(next.service);
     heroService.className = 'hero-service ' + next.service;
-    heroDest.textContent = (next.service === 'shuttle' || next.service === 'tiaro') ? next.dest : next.dest + ' 行き';
+    const noSuffix = next.service === 'shuttle' || next.service === 'tiaro' || next.service === 'r23' || next.service === 'brtSb';
+    heroDest.textContent = noSuffix ? next.dest : next.dest + ' 行き';
     heroNextDay.textContent = next.isNextDay
       ? `（明日 ${next.dayType==='weekend'?'土休日':'平日'}ダイヤ）` : '';
   } else {
@@ -723,10 +1027,8 @@ function render() {
     heroDest.textContent = '';
     heroNextDay.textContent = '';
   }
-
-  // Upcoming list (skip hero, show next 5)
   const upcoming = buses.slice(1, 6);
-  const list = document.getElementById('upcomingList');
+  const list = document.getElementById('upcomingList' + sfx);
   if (upcoming.length === 0) {
     list.innerHTML = '<div class="no-bus">この後のバスはありません</div>';
   } else {
@@ -740,91 +1042,179 @@ function render() {
       </div>`;
     }).join('');
   }
+}
 
-  // Timetables
-  const displayType = activeTab || todayType;
-  document.querySelectorAll('.tab').forEach(t => {
-    t.classList.toggle('active', t.dataset.type === displayType);
-  });
-  const isToday = displayType === todayType;
+function render() {
+  const realNow = new Date();
+  const isSim = simDateTime !== null;
 
-  // Find next bus per service for highlighting
-  let nextLinerTotal = null;
-  let nextBrtTotal = null;
-  let nextShuttleTotal = null;
-  let nextTiaroTotal = null;
-  if (isToday) {
-    const allToday = getAllBuses(todayType);
-    const nl = allToday.find(t => t.service === 'liner' && t.total > currentTotal);
-    const nb = allToday.find(t => t.service === 'brt' && t.total > currentTotal);
-    const ns = allToday.find(t => t.service === 'shuttle' && t.total > currentTotal);
-    const nt = allToday.find(t => t.service === 'tiaro' && t.total > currentTotal);
-    if (nl) nextLinerTotal = nl.total;
-    if (nb) nextBrtTotal = nb.total;
-    if (ns) nextShuttleTotal = ns.total;
-    if (nt) nextTiaroTotal = nt.total;
-  }
+  document.getElementById('btnNow').classList.toggle('hidden', !isSim);
+  document.getElementById('simBadge').classList.toggle('hidden', !isSim);
+  document.getElementById('simBadgeG').classList.toggle('hidden', !isSim);
+  document.getElementById('simBadgeS').classList.toggle('hidden', !isSim);
 
-  // Render Liner timetable
-  renderTimetable(
-    'ttLiner', displayType === 'weekend' ? LINER_WE : LINER_WD,
-    'liner', displayType, isToday, currentH, currentTotal, nextLinerTotal,
-    (h, m) => {
-      const isYk = linerDest(h, m, displayType) === '有楽町駅';
-      return { special: isYk, tooltip: isYk ? '有楽町駅行き' : '東京駅八重洲北口行き' };
-    },
-    [
-      { color: '#1a73e8', border: false, label: '東京駅八重洲北口' },
-      { color: '#e57373', border: true, label: '有楽町駅' }
-    ]
-  );
+  const now = isSim ? simDateTime : realNow;
+  const todayType = getDayType(now);
+  const currentH = now.getHours();
+  const currentM = now.getMinutes();
+  const currentTotal = currentH*60 + currentM;
 
-  // Render BRT timetable
-  renderTimetable(
-    'ttBrt', displayType === 'weekend' ? BRT_WE : BRT_WD,
-    'brt', displayType, isToday, currentH, currentTotal, nextBrtTotal,
-    (h, m) => {
-      const isShinbashi = brtDest(h, m, displayType) === '新橋 止まり';
-      return { special: isShinbashi, tooltip: isShinbashi ? '新橋止まり' : '虎ノ門ヒルズ行き' };
-    },
-    [
-      { color: '#00897b', border: false, label: '虎ノ門ヒルズ' },
-      { color: '#e57373', border: true, label: '新橋止まり' }
-    ]
-  );
+  document.getElementById('dayBadge').textContent =
+    todayType === 'weekend' ? '土休日ダイヤ' : '平日ダイヤ';
 
-  // Render Shuttle timetable (weekday only)
-  const shuttleSection = document.getElementById('shuttleSection');
-  const tiaroSection = document.getElementById('tiaroSection');
-  if (displayType === 'weekend') {
-    shuttleSection.style.display = 'none';
-    tiaroSection.style.display = 'none';
-  } else {
-    shuttleSection.style.display = '';
-    renderTimetable(
-      'ttShuttle', SHUTTLE_WD,
-      'shuttle', displayType, isToday, currentH, currentTotal, nextShuttleTotal,
+  const clockText = isSim
+    ? `指定: ${fmtDate(now)} ${fmt(currentH, currentM)}`
+    : `${fmtDate(realNow)} ${fmt(currentH, currentM)}:${String(realNow.getSeconds()).padStart(2,'0')}`;
+
+  if (activePage === 'harumi') {
+    updateHero('', getNextBuses(now, 6), clockText);
+
+    const displayType = activeTab || todayType;
+    document.querySelectorAll('.tab[data-page="harumi"]').forEach(t => {
+      t.classList.toggle('active', t.dataset.type === displayType);
+    });
+    const isToday = displayType === todayType;
+
+    let nextLinerTotal = null, nextBrtTotal = null, nextShuttleTotal = null, nextTiaroTotal = null;
+    if (isToday) {
+      const allToday = getAllBuses(todayType);
+      const nl = allToday.find(t => t.service === 'liner'   && t.total > currentTotal);
+      const nb = allToday.find(t => t.service === 'brt'     && t.total > currentTotal);
+      const ns = allToday.find(t => t.service === 'shuttle' && t.total > currentTotal);
+      const nt = allToday.find(t => t.service === 'tiaro'   && t.total > currentTotal);
+      if (nl) nextLinerTotal   = nl.total;
+      if (nb) nextBrtTotal     = nb.total;
+      if (ns) nextShuttleTotal = ns.total;
+      if (nt) nextTiaroTotal   = nt.total;
+    }
+
+    renderTimetable('ttLiner', displayType === 'weekend' ? LINER_WE : LINER_WD,
+      'liner', displayType, isToday, currentH, currentTotal, nextLinerTotal,
       (h, m) => {
-        const isDirect = shuttleDest(h, m) === '東銀座直行';
-        return { special: isDirect, tooltip: isDirect ? '東銀座直行' : '月島駅経由' };
+        const isYk = linerDest(h, m, displayType) === '有楽町駅';
+        return { special: isYk, tooltip: isYk ? '有楽町駅行き' : '東京駅八重洲北口行き' };
       },
-      [
-        { color: '#e67c00', border: false, label: '月島駅経由' },
-        { color: '#e57373', border: true, label: '東銀座直行' }
-      ]
+      [{ color: '#1a73e8', border: false, label: '東京駅八重洲北口' },
+       { color: '#e57373', border: true,  label: '有楽町駅' }]
     );
 
-    tiaroSection.style.display = '';
-    renderTimetable(
-      'ttTiaro', TIARO_WD,
-      'tiaro', displayType, isToday, currentH, currentTotal, nextTiaroTotal,
+    renderTimetable('ttBrt', displayType === 'weekend' ? BRT_WE : BRT_WD,
+      'brt', displayType, isToday, currentH, currentTotal, nextBrtTotal,
       (h, m) => {
-        const isDirect = tiaroDest(h, m) === '東銀座直行';
-        return { special: isDirect, tooltip: isDirect ? '東銀座直行' : '月島駅経由' };
+        const isShinbashi = brtDest(h, m, displayType) === '新橋 止まり';
+        return { special: isShinbashi, tooltip: isShinbashi ? '新橋止まり' : '虎ノ門ヒルズ行き' };
+      },
+      [{ color: '#00897b', border: false, label: '虎ノ門ヒルズ' },
+       { color: '#e57373', border: true,  label: '新橋止まり' }]
+    );
+
+    const shuttleSection = document.getElementById('shuttleSection');
+    const tiaroSection   = document.getElementById('tiaroSection');
+    if (displayType === 'weekend') {
+      shuttleSection.style.display = 'none';
+      tiaroSection.style.display   = 'none';
+    } else {
+      shuttleSection.style.display = '';
+      renderTimetable('ttShuttle', SHUTTLE_WD,
+        'shuttle', displayType, isToday, currentH, currentTotal, nextShuttleTotal,
+        (h, m) => {
+          const isDirect = shuttleDest(h, m) === '東銀座直行';
+          return { special: isDirect, tooltip: isDirect ? '東銀座直行' : '月島駅経由' };
+        },
+        [{ color: '#e67c00', border: false, label: '月島駅経由' },
+         { color: '#e57373', border: true,  label: '東銀座直行' }]
+      );
+      tiaroSection.style.display = '';
+      renderTimetable('ttTiaro', TIARO_WD,
+        'tiaro', displayType, isToday, currentH, currentTotal, nextTiaroTotal,
+        (h, m) => {
+          const isDirect = tiaroDest(h, m) === '東銀座直行';
+          return { special: isDirect, tooltip: isDirect ? '東銀座直行' : '月島駅経由' };
+        },
+        [{ color: '#e67c00', border: false, label: '月島駅経由' },
+         { color: '#e57373', border: true,  label: '東銀座直行' }]
+      );
+    }
+
+  } else if (activePage === 'ginza') {
+    updateHero('G', getNextBusesGinza(now, 6), clockText);
+
+    const displayTypeG = activeTabG || todayType;
+    document.querySelectorAll('.tab[data-page="ginza"]').forEach(t => {
+      t.classList.toggle('active', t.dataset.type === displayTypeG);
+    });
+    const isTodayG = displayTypeG === todayType;
+
+    let nextTo051Total = null, nextTo06Total = null, nextR23Total = null, nextGTiaroTotal = null;
+    if (isTodayG) {
+      const allTodayG = getAllBusesGinza(todayType);
+      const n1 = allTodayG.find(t => t.service === 'to051'  && t.total > currentTotal);
+      const n2 = allTodayG.find(t => t.service === 'to06'   && t.total > currentTotal);
+      const n3 = allTodayG.find(t => t.service === 'r23'    && t.total > currentTotal);
+      const n4 = allTodayG.find(t => t.service === 'gtiaro' && t.total > currentTotal);
+      if (n1) nextTo051Total  = n1.total;
+      if (n2) nextTo06Total   = n2.total;
+      if (n3) nextR23Total    = n3.total;
+      if (n4) nextGTiaroTotal = n4.total;
+    }
+
+    renderTimetable('ttTo051', displayTypeG === 'weekend' ? TO051_WE : TO051_WD,
+      'to051', displayTypeG, isTodayG, currentH, currentTotal, nextTo051Total,
+      () => ({ special: false, tooltip: '晴海埠頭行き' }),
+      [{ color: '#c62828', border: false, label: '晴海埠頭' }]
+    );
+
+    renderTimetable('ttTo06', displayTypeG === 'weekend' ? TO06_WE : TO06_WD,
+      'to06', displayTypeG, isTodayG, currentH, currentTotal, nextTo06Total,
+      () => ({ special: false, tooltip: '有明一丁目行き' }),
+      [{ color: '#6a1b9a', border: false, label: '有明一丁目' }]
+    );
+
+    renderTimetable('ttR23', displayTypeG === 'weekend' ? R23_WE : R23_WD,
+      'r23', displayTypeG, isTodayG, currentH, currentTotal, nextR23Total,
+      () => ({ special: false, tooltip: '晴海埠頭方面' }),
+      [{ color: '#0277bd', border: false, label: '晴海埠頭方面' }]
+    );
+
+    const ginzaTiaroSection = document.getElementById('ginzaTiaroSection');
+    if (displayTypeG === 'weekend') {
+      ginzaTiaroSection.style.display = 'none';
+    } else {
+      ginzaTiaroSection.style.display = '';
+      renderTimetable('ttGTiaro', GINZA_TIARO_WD,
+        'gtiaro', displayTypeG, isTodayG, currentH, currentTotal, nextGTiaroTotal,
+        () => ({ special: false, tooltip: 'ティアロ行き' }),
+        [{ color: '#e67c00', border: false, label: 'ティアロ' }]
+      );
+    }
+
+  } else {
+    updateHero('S', getNextBusesShimbashi(now, 6), clockText);
+
+    const displayTypeS = activeTabS || todayType;
+    document.querySelectorAll('.tab[data-page="shimbashi"]').forEach(t => {
+      t.classList.toggle('active', t.dataset.type === displayTypeS);
+    });
+    const isTodayS = displayTypeS === todayType;
+
+    let nextBrtSbTotal = null;
+    if (isTodayS) {
+      const allTodayS = getAllBusesShimbashi(todayType);
+      const n = allTodayS.find(t => t.service === 'brtSb' && t.total > currentTotal);
+      if (n) nextBrtSbTotal = n.total;
+    }
+
+    renderTimetable('ttBrtSb', displayTypeS === 'weekend' ? BRT_SB_WE : BRT_SB_WD,
+      'brtSb', displayTypeS, isTodayS, currentH, currentTotal, nextBrtSbTotal,
+      (h, m) => {
+        const dest = brtSbDest(h, m, displayTypeS);
+        const isHarumi = dest === '晴海BRTターミナル止まり';
+        const isToyosu = dest === '豊洲市場前';
+        return { special: isHarumi || isToyosu, tooltip: dest + '行き' };
       },
       [
-        { color: '#e67c00', border: false, label: '月島駅経由' },
-        { color: '#e57373', border: true, label: '東銀座直行' }
+        { color: '#00897b', border: false, label: 'ミチノテラス豊洲' },
+        { color: '#e57373', border: true,  label: '豊洲市場前 / 晴海止まり' }
       ]
     );
   }
@@ -832,7 +1222,7 @@ function render() {
 
 function renderTimetable(id, sched, service, displayType, isToday, currentH, currentTotal, nextTotal, infoFn, legendItems) {
   const hours = Object.keys(sched).map(Number).sort((a,b)=>a-b);
-  const nextCls = `next-${service}`;
+  const nextCls   = `next-${service}`;
   const currentCls = `current-${service}`;
 
   const legend = `<div class="legend">${legendItems.map(li =>
@@ -840,9 +1230,9 @@ function renderTimetable(id, sched, service, displayType, isToday, currentH, cur
   ).join('')}</div>`;
 
   document.getElementById(id).innerHTML = legend + hours.map(hour => {
-    const isPast = isToday && hour < currentH;
+    const isPast    = isToday && hour < currentH;
     const isCurrent = isToday && hour === currentH;
-    const rowClass = isPast ? 'tt-row past' : isCurrent ? `tt-row ${currentCls}` : 'tt-row';
+    const rowClass  = isPast ? 'tt-row past' : isCurrent ? `tt-row ${currentCls}` : 'tt-row';
 
     const mins = sched[hour].map(m => {
       const t = hour*60+m;
@@ -865,6 +1255,8 @@ function renderTimetable(id, sched, service, displayType, isToday, currentH, cur
 render();
 setInterval(render, 1000);
 activeTab = null;
+activeTabG = null;
+activeTabS = null;
 </script>
 </body>
 </html>
