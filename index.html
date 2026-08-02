@@ -523,7 +523,7 @@
   </div>
 
   <div class="timetable-section">
-    <div class="tt-header liner">晴海ライナー<span class="dest-note">晴海二丁目発</span><a href="https://www.hitachi-gr.com/_files/ugd/988479_8a2511fd90f04d24a2bd27ee6d2b7747.pdf" target="_blank" class="tt-source-link">時刻表PDF</a></div>
+    <div class="tt-header liner">晴海ライナー<span class="dest-note">晴海二丁目発</span><a href="https://a5b01365-e2b1-40bf-a834-cf398b37d49c.filesusr.com/ugd/988479_c2c80c1377c04181affcba4afe12b994.pdf" target="_blank" class="tt-source-link">時刻表PDF</a></div>
     <div class="timetable" id="ttLiner"></div>
   </div>
 
@@ -619,15 +619,15 @@
 // ===== 晴海ライナー =====
 const LINER_WD = {
   7:[16,36,56], 8:[16,36], 9:[1,26,51], 10:[13,43], 11:[13,43],
-  12:[13,53], 13:[33], 14:[13,53], 15:[33], 16:[3,33,59],
+  12:[13,43], 13:[3,33], 14:[13,53], 15:[33], 16:[3,33,59],
   17:[27,50], 18:[19,36], 19:[8]
 };
 const LINER_WE = {
-  8:[26], 9:[26,56], 10:[36], 11:[6,36], 12:[36],
-  13:[26,56], 14:[26], 15:[0,18], 16:[15,56], 17:[50],
-  18:[19], 19:[8]
+  8:[41], 9:[6,31,56], 10:[26,56], 11:[26,56], 12:[26],
+  13:[6,36], 14:[6,54], 15:[26], 16:[6,36], 17:[6,31,59],
+  18:[19,51], 19:[8]
 };
-const LINER_YK_WD = new Set(['7:16','7:36','7:56','8:16','8:36','18:19','19:08']);
+const LINER_YK_WD = new Set(['7:16','7:36','7:56','8:16','13:03','18:19','19:08']);
 const LINER_YK_WE = new Set(['18:19','19:08']);
 
 function linerDest(h, m, dayType) {
