@@ -245,6 +245,10 @@
     font-size: 11px;
     opacity: .8;
   }
+  .tt-header .tt-title {
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
   .tt-source-link {
     margin-left: auto;
     font-size: 11px;
@@ -254,6 +258,14 @@
     white-space: nowrap;
   }
   .tt-source-link:hover { color: #fff; }
+  .tt-caveat {
+    background: var(--card);
+    color: var(--sub);
+    font-size: 11px;
+    line-height: 1.5;
+    padding: 6px 16px;
+    border-bottom: 1px solid var(--border);
+  }
   .timetable {
     background: var(--card);
     border-radius: 0 0 var(--radius) var(--radius);
@@ -533,12 +545,13 @@
   </div>
 
   <div class="timetable-section" id="shuttleSection">
-    <div class="tt-header shuttle">住民バス<span class="dest-note">クロノレジデンス発（平日のみ）</span></div>
+    <div class="tt-header shuttle"><span class="tt-title">住民バス</span><span class="dest-note">クロノレジデンス発・月島駅経由東銀座行き（平日のみ・2026/9/1改正）</span></div>
     <div class="timetable" id="ttShuttle"></div>
   </div>
 
   <div class="timetable-section" id="tiaroSection">
-    <div class="tt-header tiaro">住民バス<span class="dest-note">ティアロ発（平日のみ）</span></div>
+    <div class="tt-header tiaro"><span class="tt-title">住民バス</span><span class="dest-note">ティアロ発（平日のみ）</span></div>
+    <div class="tt-caveat">※2026年9月1日よりクロノ・ティアロ合同運行が開始。この時刻は改正前のデータで、現在の正確な時刻は未確認です（参考情報）</div>
     <div class="timetable" id="ttTiaro"></div>
   </div>
   </div><!-- /harumiPage -->
@@ -580,7 +593,8 @@
   </div>
 
   <div class="timetable-section" id="ginzaTiaroSection">
-    <div class="tt-header gtiaro">住民バス<span class="dest-note">銀座四丁目発（ティアロ行き・平日のみ）</span></div>
+    <div class="tt-header gtiaro"><span class="tt-title">住民バス</span><span class="dest-note">銀座6丁目発・月島駅経由クロノレジデンス行き（平日のみ・2026/9/1改正）</span></div>
+    <div class="tt-caveat">※夜便はマイクロバスのみ運行。合同運行のため便によりティアロレジデンス経由順が異なり、ティアロ発着の正確な時刻は未確認です</div>
     <div class="timetable" id="ttGTiaro"></div>
   </div>
   </div><!-- /ginzaPage -->
@@ -660,16 +674,11 @@ function brtDest(h, m, dayType) {
   return isShinbashi ? '新橋 止まり' : '虎ノ門ヒルズ';
 }
 
-// ===== 住民バス（クロノレジデンス発・平日のみ）=====
+// ===== 住民バス（クロノレジデンス発・平日のみ・2026/9/1改正）=====
+// クロノ・ティアロ合同運行開始により、朝便は全て月島駅経由東銀座着となり「直行」便は廃止
 const SHUTTLE_WD = {
-  6:[30,45], 7:[0,15,30,45], 8:[0,15,30,45], 9:[0,15,45]
+  6:[32,40,57], 7:[9,15,32,42,50], 8:[7,19,25,42,52], 9:[0,17,35,52]
 };
-const SHUTTLE_DIRECT_WD = new Set(['6:45','7:15','7:45','8:15','8:45','9:15']);
-
-function shuttleDest(h, m) {
-  const key = `${h}:${String(m).padStart(2,'0')}`;
-  return SHUTTLE_DIRECT_WD.has(key) ? '東銀座直行' : '月島駅経由';
-}
 
 // ===== 住民バス（ティアロ発・平日のみ）=====
 const TIARO_WD = {
@@ -714,9 +723,9 @@ const TO06_WE = {
   19:[3,13,34,53], 20:[4]
 };
 
-// ===== 銀座 住民バス（ティアロ行き・平日のみ）=====
+// ===== 銀座 住民バス（銀座6丁目発・クロノレジデンス行き・平日のみ・2026/9/1改正）=====
 const GINZA_TIARO_WD = {
-  18:[30], 19:[5,40], 20:[13,43], 21:[13]
+  18:[30], 19:[10,50], 20:[30], 21:[10]
 };
 
 // ===== 新橋 東京BRT（晴海・豊洲ルート）=====
@@ -788,9 +797,9 @@ function schedToList(sched, service, dayType) {
       else if (service === 'to051') dest = '晴海埠頭（2番のりば）';
       else if (service === 'to06') dest = '有明一丁目（4番のりば）';
       else if (service === 'r23') dest = '晴海埠頭方面（2番のりば）';
-      else if (service === 'gtiaro') dest = 'ティアロ';
+      else if (service === 'gtiaro') dest = 'クロノレジデンス';
       else if (service === 'brtSb') dest = brtSbDest(h, m, dayType);
-      else dest = shuttleDest(h, m);
+      else dest = '月島駅経由東銀座';
       times.push({ h, m, total: h*60+m, service, dest, dayType });
     }
   }
@@ -918,7 +927,7 @@ function svcLabel(svc) {
   if (svc === 'to051') return '都05-1';
   if (svc === 'to06') return '都05-2';
   if (svc === 'r23') return '都03';
-  if (svc === 'gtiaro') return 'ティアロ';
+  if (svc === 'gtiaro') return 'クロノ';
   if (svc === 'brtSb') return 'BRT';
   return 'クロノ';
 }
@@ -930,7 +939,7 @@ function svcFullLabel(svc) {
   if (svc === 'to051') return '都05-1 晴海埠頭行';
   if (svc === 'to06') return '都05-2 有明一丁目行';
   if (svc === 'r23') return '都03 晴海埠頭方面';
-  if (svc === 'gtiaro') return '住民バス（ティアロ行き）';
+  if (svc === 'gtiaro') return '住民バス（クロノレジデンス行き）';
   if (svc === 'brtSb') return '東京BRT（晴海・豊洲ルート）';
   return '住民バス（クロノ）';
 }
@@ -1117,12 +1126,8 @@ function render() {
       shuttleSection.style.display = '';
       renderTimetable('ttShuttle', SHUTTLE_WD,
         'shuttle', displayType, isToday, currentH, currentTotal, nextShuttleTotal,
-        (h, m) => {
-          const isDirect = shuttleDest(h, m) === '東銀座直行';
-          return { special: isDirect, tooltip: isDirect ? '東銀座直行' : '月島駅経由' };
-        },
-        [{ color: '#e67c00', border: false, label: '月島駅経由' },
-         { color: '#e57373', border: true,  label: '東銀座直行' }]
+        () => ({ special: false, tooltip: '月島駅経由東銀座行き' }),
+        [{ color: '#e67c00', border: false, label: '月島駅経由東銀座' }]
       );
       tiaroSection.style.display = '';
       renderTimetable('ttTiaro', TIARO_WD,
@@ -1183,8 +1188,8 @@ function render() {
       ginzaTiaroSection.style.display = '';
       renderTimetable('ttGTiaro', GINZA_TIARO_WD,
         'gtiaro', displayTypeG, isTodayG, currentH, currentTotal, nextGTiaroTotal,
-        () => ({ special: false, tooltip: 'ティアロ行き' }),
-        [{ color: '#e67c00', border: false, label: 'ティアロ' }]
+        () => ({ special: false, tooltip: '月島駅経由クロノレジデンス行き' }),
+        [{ color: '#e67c00', border: false, label: 'クロノレジデンス' }]
       );
     }
 
