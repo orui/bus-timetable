@@ -763,9 +763,40 @@ let activeTabS = null;
 let activePage = 'harumi';
 let simDateTime = null;
 
+// 祝日（現行の祝日法。振替休日・国民の休日を含む）。祝日は土休日ダイヤで扱う
+function isNamedHoliday(date) {
+  const y = date.getFullYear(), mo = date.getMonth() + 1, day = date.getDate(), wd = date.getDay();
+  const nthMonday = n => wd === 1 && Math.ceil(day / 7) === n;
+  const equinox = base => Math.floor(base + 0.242194 * (y - 1980) - Math.floor((y - 1980) / 4));
+  switch (mo) {
+    case 1:  return day === 1 || nthMonday(2);
+    case 2:  return day === 11 || day === 23;
+    case 3:  return day === equinox(20.8431);
+    case 4:  return day === 29;
+    case 5:  return day >= 3 && day <= 5;
+    case 7:  return nthMonday(3);
+    case 8:  return day === 11;
+    case 9:  return nthMonday(3) || day === equinox(23.2488);
+    case 10: return nthMonday(2);
+    case 11: return day === 3 || day === 23;
+    default: return false;
+  }
+}
+
+function isJpHoliday(date) {
+  if (isNamedHoliday(date)) return true;
+  const shift = n => new Date(date.getFullYear(), date.getMonth(), date.getDate() + n);
+  // 振替休日：日曜の祝日のあと、最初の祝日でない日
+  for (let p = shift(-1); isNamedHoliday(p); p = new Date(p.getFullYear(), p.getMonth(), p.getDate() - 1)) {
+    if (p.getDay() === 0) return true;
+  }
+  // 国民の休日：祝日にはさまれた平日
+  return date.getDay() !== 0 && isNamedHoliday(shift(-1)) && isNamedHoliday(shift(1));
+}
+
 function getDayType(date) {
   const d = date.getDay();
-  return (d === 0 || d === 6) ? 'weekend' : 'weekday';
+  return (d === 0 || d === 6 || isJpHoliday(date)) ? 'weekend' : 'weekday';
 }
 
 function schedToList(sched, service, dayType) {
@@ -1047,7 +1078,7 @@ function render() {
   const currentTotal = currentH*60 + currentM;
 
   document.getElementById('dayBadge').textContent =
-    todayType === 'weekend' ? '土休日ダイヤ' : '平日ダイヤ';
+    todayType === 'weekend' ? (now.getDay() % 6 && isJpHoliday(now) ? '土休日ダイヤ（祝日）' : '土休日ダイヤ') : '平日ダイヤ';
 
   const clockText = isSim
     ? `指定: ${fmtDate(now)} ${fmt(currentH, currentM)}`
